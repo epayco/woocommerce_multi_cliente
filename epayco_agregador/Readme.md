@@ -1,1 +1,0 @@
-# epayco agregador
