@@ -396,7 +396,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                     }
                             </script>
                         </div>       
-                ',$this->epayco_publickey,$test_mode,$order->get_total(),$order->get_total(),$tax,$base_tax, $descripcion, $descripcion, $currency, $order->get_id(), $basedCountry, $external_type, $redirect_url,$confirm_url,
+                ',$this->epayco_publickey,$test_mode,$order->get_total(),$tax,$base_tax, $descripcion, $descripcion, $currency, $order->get_id(),$order->get_id(), $basedCountry, $external_type, $redirect_url,$confirm_url,
                     $email_billing,$name_billing,$address_billing,$epayco_lang,$phone_billing);
                    
                     $messageload = __('Espere por favor..Cargando checkout.','payco-woocommerce');
