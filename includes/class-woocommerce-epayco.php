@@ -450,9 +450,13 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     }else{
                        
                         $explode=explode('?',$_GET['order_id']);
+                        $explode_ref_payco=explode('?',$_GET['ref_payco']);
                         $order_id=$explode[0];
                         $strref_payco=explode("=",$explode[1]);
                         $ref_payco=$strref_payco[1];
+                        if(is_null($red_payco) ){
+                            $ref_payco =  $explode_ref_payco[0];
+                         }
                         $url = 'https://secure.epayco.co/validation/v1/reference/'.$ref_payco;
                         $responseData = $this->agafa_dades($url,false,$this->goter());
                         $jsonData = @json_decode($responseData, true);
