@@ -25,7 +25,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
         // Saving hook
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         // Payment listener/API hook
-       // add_action('woocommerce_api_wc_gateway_' . $this->id, [$this, 'gateway_ipn']);
+
          add_action( 'woocommerce_api_' . strtolower( get_class( $this ) ), array( $this, 'check_ePayco_response' ) );
         // Status change hook
         add_action('woocommerce_order_status_changed', [$this, 'change_status_action'], 10, 3);
@@ -40,7 +40,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
      */
     protected function setup_properties() {
         $this->id                 = 'epayco';
-        $this->icon               = apply_filters('woocommerce_epayco_icon', 'https://369969691f476073508a-60bf0867add971908d4f26a64519c2aa.ssl.cf5.rackcdn.com/logos/logo_epayco_200px.png');
+        $this->icon               = apply_filters('woocommerce_epayco_icon', 'https://multimedia.epayco.co/epayco-landing/btns/epayco-logo-fondo-claro-lite.png
+');
         $this->method_title       = __('ePayco Checkout', 'epayco');
         $this->method_description = __('Acepta tarjetas de credito, depositos y transferencias.', 'epayco');
         $this->has_fields         = false;
@@ -351,7 +352,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                             <div class="loading"></div>
                         </div>
                         <p style="text-align: center;" class="epayco-title">
-                            <span class="animated-points">Cargando metodos de pago</span>
+                            <span class="animated-points">Cargando métodos de pago</span>
                            <br>'.$message.'
                         </p>
                         <div id="epayco_form" style="text-align: center;">
@@ -382,8 +383,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                             name_billing: "%s",
                                             address_billing: "%s",
                                             lang:"%s",
-                                            mobilephone_billing: "%s",
-                                            force_response: true
+                                            mobilephone_billing: "%s"
                                             };  
 
                                     setTimeout(function(){ 
@@ -396,7 +396,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                     }
                             </script>
                         </div>       
-                ',$this->epayco_publickey,$test_mode,$order->get_total(),$tax,$base_tax, $descripcion, $descripcion, $currency, $order->get_id(),$order->get_id(), $basedCountry, $external_type, $redirect_url,$confirm_url,
+                ',$this->epayco_publickey,$test_mode,$order->get_total(),$tax,$base_tax, $descripcion, $descripcion, $currency, $order->get_id(), $order->get_id(), $basedCountry, $external_type, $redirect_url,$confirm_url,
                     $email_billing,$name_billing,$address_billing,$epayco_lang,$phone_billing);
                    
                     $messageload = __('Espere por favor..Cargando checkout.','payco-woocommerce');
@@ -450,13 +450,13 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     }else{
                        
                         $explode=explode('?',$_GET['order_id']);
-                        $explode_ref_payco=explode('?',$_GET['ref_payco']);
+                        $explode2=explode('?',$_GET['ref_payco']);
                         $order_id=$explode[0];
                         $strref_payco=explode("=",$explode[1]);
                         $ref_payco=$strref_payco[1];
                         if(is_null($red_payco) ){
-                            $ref_payco =  $explode_ref_payco[0];
-                         }
+                           $ref_payco =  $explode2[0];
+                        }
                         $url = 'https://secure.epayco.co/validation/v1/reference/'.$ref_payco;
                         $responseData = $this->agafa_dades($url,false,$this->goter());
                         $jsonData = @json_decode($responseData, true);
@@ -464,7 +464,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         $ref_payco = $validationData['x_ref_payco'];
 
                     }
-                        //Validamos la firma
+                    
+                    //Validamos la firma
                     if ($order_id!="" && $ref_payco!="") {
                         $order = new WC_Order($order_id);
                         $signature = hash('sha256',
@@ -669,7 +670,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 'title' => __('Enable/Disable', 'woocommerce'),
                 'label' => __('Habilitar ePayco Checkout', 'epayco'),
                 'type' => 'checkbox',
-                'description' => __('Para obtener las credenciales de configuración, <a href="https://dashboard.epayco.co/login?utm_campaign=epayco&utm_medium=button-header&utm_source=web#registro" target="_blank">Inicie sección</a>.', 'epayco'),
+                'description' => __('Para obtener las credenciales de configuración, <a href="https://dashboard.epayco.co/login?utm_campaign=epayco&utm_medium=button-header&utm_source=web#registro" target="_blank">Inicie sesión</a>.', 'epayco'),
                 'default' => 'yes',
             ),
             'title' => array(
