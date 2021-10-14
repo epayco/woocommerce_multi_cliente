@@ -235,7 +235,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     $message = '<span class="animated-points">Loading payment methods</span>
                     <br>
                         <small class="epayco-subtitle">If they are not charged automatically, click the  "Pay with ePayco" button</small>';
-                    $button ='https://multimedia.epayco.co/epayco-landing/btns/Boton-epayco-color-Ingles.png';
+                    $button ='<img src="https://multimedia.epayco.co/epayco-landing/btns/Boton-epayco-color-Ingles.png">';
           		}
           		$test_mode = $this->epayco_testmode == "yes" ? "true" : "false";
           		
@@ -779,7 +779,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 'title' => __('Enable/Disable', 'woocommerce'),
                 'label' => __('Habilitar ePayco Checkout', 'epayco'),
                 'type' => 'checkbox',
-                'description' => __('Para obtener las credenciales de configuración, <a href="https://dashboard.epayco.co/login?utm_campaign=epayco&utm_medium=button-header&utm_source=web#registro" target="_blank">Inicie sección</a>.', 'epayco'),
+                'description' => __('Para obtener las credenciales de configuración, <a href="https://dashboard.epayco.co/login?utm_campaign=epayco&utm_medium=button-header&utm_source=web#registro" target="_blank">Inicie sesión</a>.', 'epayco'),
                 'default' => 'yes',
             ),
             'title' => array(
