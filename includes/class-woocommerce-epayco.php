@@ -21,7 +21,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
         $this->epayco_testmode = $this->get_option('epayco_testmode');
         $this->epayco_lang = $this->get_option('epayco_lang');
         $this->epayco_type_checkout = $this->get_option('epayco_type_checkout');
-
+        $this->epayco_endorder_state = $this->get_option('epayco_endorder_state');
+        update_option('epaycor_order_status', $this->get_option('epayco_testmode'));
         // Saving hook
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         // Payment listener/API hook
@@ -40,7 +41,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
      */
     protected function setup_properties() {
         $this->id                 = 'epayco';
-        $this->icon               = apply_filters('woocommerce_epayco_icon', 'https://multimedia.epayco.co/epayco-landing/btns/epayco-logo-fondo-claro-lite.png');
+        $this->icon               = apply_filters('woocommerce_epayco_icon', plugin_dir_url(__FILE__).'/logo.png');
         $this->method_title       = __('ePayco Checkout', 'epayco');
         $this->method_description = __('Acepta tarjetas de credito, depositos y transferencias.', 'epayco');
         $this->has_fields         = false;
@@ -58,6 +59,78 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
             $optionSuffix = '';
         }
     }
+    
+    public function is_valid_for_use()
+    {
+                return in_array(get_woocommerce_currency(), array('COP', 'USD'));
+    }
+    
+    public function admin_options()
+    {
+    ?>
+                <style>
+                    tbody{
+                    }
+                    .epayco-table tr:not(:first-child) {
+                        border-top: 1px solid #ededed;
+                    }
+                    .epayco-table tr th{
+                            padding-left: 15px;
+                            text-align: -webkit-right;
+                    }
+                    .epayco-table input[type="text"]{
+                            padding: 8px 13px!important;
+                            border-radius: 3px;
+                            width: 100%!important;
+                    }
+                    .epayco-table .description{
+                        color: #afaeae;
+                    }
+                    .epayco-table select{
+                            padding: 8px 13px!important;
+                            border-radius: 3px;
+                            width: 100%!important;
+                            height: 37px!important;
+                    }
+                    .epayco-required::before{
+                        content: '* ';
+                        font-size: 16px;
+                        color: #F00;
+                        font-weight: bold;
+                    }
+
+                </style>
+                <div class="container-fluid">
+                    <div class="panel panel-default" style="">
+                        <img  src="<?php echo plugin_dir_url(__FILE__).'/logo.png' ?>">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-pencil"></i>Configuración <?php _e('ePayco', 'epayco'); ?></h3>
+                        </div>
+
+                        <div style ="color: #31708f; background-color: #d9edf7; border-color: #bce8f1;padding: 10px;border-radius: 5px;">
+                            <b>Este modulo le permite aceptar pagos seguros por la plataforma de pagos ePayco</b>
+                            <br>Si el cliente decide pagar por ePayco, el estado del pedido cambiara a ePayco Esperando Pago
+                            <br>Cuando el pago sea Aceptado o Rechazado ePayco envia una configuracion a la tienda para cambiar el estado del pedido.
+                        </div>
+
+                        <div class="panel-body" style="padding: 15px 0;background: #fff;margin-top: 15px;border-radius: 5px;border: 1px solid #dcdcdc;border-top: 1px solid #dcdcdc;">
+                                <table class="form-table epayco-table">
+                                <?php
+                            if ($this->is_valid_for_use()) :
+                                $this->generate_settings_html();
+                            else :
+                            if ( is_admin() && ! defined( 'DOING_AJAX')) {
+                                echo '<div class="error"><p><strong>' . __( 'ePayco: Requiere que la moneda sea USD O COP', 'epayco' ) . '</strong>: ' . sprintf(__('%s', 'woocommerce-mercadopago' ), '<a href="' . admin_url() . 'admin.php?page=wc-settings&tab=general#s2id_woocommerce_currency">' . __( 'Click aquí para configurar!', 'epayco') . '</a>' ) . '</p></div>';
+                                        }
+                                    endif;
+                                ?>
+                                </table>
+                        </div>
+                    </div>
+                </div>
+                <?php
+            }
+            
 
     function init_form_fields()
     {
@@ -217,10 +290,11 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 $order = new WC_Order($order_id);
                 $tax=$order->get_total_tax();
                 $tax=round($tax,2);
+                
                 if((int)$tax>0){
                     $base_tax=$order->get_total()-$tax;
                 }else{
-                    $base_tax=0;
+                    $base_tax=$order->get_total();
                     $tax=0;
                 }
 
@@ -230,12 +304,12 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     $message = '<span class="animated-points">Cargando métodos de pago</span>
                     <br>
                         <small class="epayco-subtitle"> Si no se cargan automáticamente, de clic en el botón "Pagar con ePayco"</small>';
-                    $button ='<img src="https://multimedia.epayco.co/epayco-landing/btns/Boton-epayco-color1.png">';
+                    $button = plugin_dir_url(__FILE__).'/Boton-color-espanol.png';
           		}else{
                     $message = '<span class="animated-points">Loading payment methods</span>
                     <br>
                         <small class="epayco-subtitle">If they are not charged automatically, click the  "Pay with ePayco" button</small>';
-                    $button ='<img src="https://multimedia.epayco.co/epayco-landing/btns/Boton-epayco-color-Ingles.png">';
+                    $button =plugin_dir_url(__FILE__).'/Boton-color-Ingles.png';
           		}
           		$test_mode = $this->epayco_testmode == "yes" ? "true" : "false";
           		
@@ -366,62 +440,38 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                 '.$message.'
                         </p>
                         <div id="epayco_form" style="text-align: center;">
-                            <center>
-                                <a onclick="payment()">'.$button.' </a>
-                            </center>
-                            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-                            <script type="text/javascript" src="https://checkout.epayco.co/checkout.js"></script>
-                            <script type="text/javascript">
-                                    var handlerEpayco = ePayco.checkout.configure({
-                                            key:"%s",
-                                            test:"%s"
-                                            });
-                                    var data={
-                                            amount:"%s",
-                                            tax: "%s",
-                                            tax_base: "%s",
-                                            name: "%s",
-                                            description:"%s",    
-                                            currency: "%s",
-                                            invoice: "%s",
-                                            country:"%s",
-                                            external: "%s",
-                                            response: "%s",
-                                            confirmation: "%s",
-                                            email_billing: "%s",
-                                            name_billing: "%s",
-                                            address_billing: "%s",
-                                            lang:"%s",
-                                            mobilephone_billing: "%s",
-                                            force_response: true
-                                            };  
-
-                                    setTimeout(function(){ 
-                                        handlerEpayco.open(data);  
-                                    }, 1000);
-
-                                    function payment(){
-                                    alert("que paso");
-                                        setTimeout(function(){
-                                        handlerEpayco.open(data);  }, 1000);
-                                    }
+                            <form>
+                            <script
+                                src="https://checkout.epayco.co/checkout.js"
+                                class="epayco-button"
+                                data-epayco-key="%s"
+                                data-epayco-test="%s"
+                                data-epayco-amount="%s"
+                                data-epayco-tax="%s"
+                                data-epayco-tax-base="%s"
+                                data-epayco-name="%s"
+                                data-epayco-description="%s"
+                                data-epayco-currency="%s"                         
+                                data-epayco-invoice="%s" 
+                                data-epayco-country="%s"
+                                data-epayco-external="%s"                       
+                                data-epayco-response="%s"
+                                data-epayco-confirmation="%s"
+                                data-epayco-email-billing="%s"
+                                data-epayco-name-billing="%s"
+                                data-epayco-address-billing="%s"
+                                data-epayco-lang="%s"
+                                data-epayco-mobilephone-billing="%s"
+                                data-epayco-button="'.$button.'"
+                                data-epayco-autoclick="true"
+                                >
                             </script>
+                        </form>
                         </div>       
-                ',$this->epayco_publickey,$test_mode,$order->get_total(),$tax,$base_tax, $descripcion, $descripcion, $currency, $order->get_id(), $basedCountry, $external_type, $redirect_url,$confirm_url,
+                ',$this->epayco_publickey,$test_mode,$order->get_total(),$tax,$base_tax, $descripcion, 
+                $descripcion, $currency, $order->get_id(), $basedCountry, $external_type, $redirect_url,$confirm_url,
                     $email_billing,$name_billing,$address_billing,$epayco_lang,$phone_billing);
-                   
-                    $messageload = __('Espere por favor..Cargando checkout.','payco-woocommerce');
-                    $js = "if(jQuery('button.epayco-button-render').length)    
-                {
-                jQuery('button.epayco-button-render').css('margin','auto');
-                jQuery('button.epayco-button-render').css('display','block');
-                }
-                ";
-                if (version_compare(WOOCOMMERCE_VERSION, '2.1', '>=')){
-                    wc_enqueue_js($js);
-                }else{
-                    $woocommerce->add_inline_js($js);
-                }
+                
             }
 
                 public function string_sanitize($string, $force_lowercase = true, $anal = false) {
@@ -454,50 +504,72 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     $signature="";
 
                     if(isset($_REQUEST['x_signature'])){
-                        $explode=explode('?',$_GET['order_id']);
-                        $order_id=$explode[0];
-                        $ref_payco=$_REQUEST['x_ref_payco'];
-
+                       $order_id = trim(sanitize_text_field($_GET['order_id']));
+                       $x_ref_payco = trim(sanitize_text_field($_REQUEST['x_ref_payco']));
+                       $x_transaction_id = trim(sanitize_text_field($_REQUEST['x_transaction_id']));
+                       $x_amount = trim(sanitize_text_field($_REQUEST['x_amount']));
+                       $x_currency_code = trim(sanitize_text_field($_REQUEST['x_currency_code']));
+                       $x_signature = trim(sanitize_text_field($_REQUEST['x_signature']));
+                       $x_cod_transaction_state=(int)trim(sanitize_text_field($_REQUEST['x_cod_response']));
+                       $x_test_request = trim(sanitize_text_field($_REQUEST['x_test_request']));
+                        $signature = hash('sha256',
+                                 trim($this->epayco_customerid).'^'
+                                .trim($this->epayco_secretkey).'^'
+                                .$x_ref_payco.'^'
+                                .$x_transaction_id.'^'
+                                .$x_amount.'^'
+                                .$x_currency_code
+                            );
                     }else{
                        
-                        
-                        $explode=explode('?',$_GET['order_id']);
-                        $explode2=explode('?',$_GET['ref_payco']);
-                        $order_id=$explode[0];
-                        $strref_payco=explode("=",$explode[1]);
-                        $ref_payco=$strref_payco[1];
-                  
-                        if(is_null($ref_payco) ){
-                           $ref_payco =  $explode2[0];
+                        $order_id_info = sanitize_text_field($_GET['order_id']);
+                        $order_id_explode = explode('=',$order_id_info);
+                        $order_id_rpl  = str_replace('?ref_payco','',$order_id_explode);
+                        $order_id = $order_id_rpl[0];
+                        $ref_payco = sanitize_text_field($_GET['ref_payco']);
+                        $isConfirmation = sanitize_text_field($_GET['confirmation']) == 1;
+                        if(empty($ref_payco)){
+                            $ref_payco =$order_id_rpl[1];
                         }
-                    
-                        if (!isset($_REQUEST['confirmation'])) {
-                            $url = 'https://secure.epayco.co/validation/v1/reference/'.$ref_payco;
-                            $responseData = $this->agafa_dades($url,false,$this->goter());
-                            $jsonData = @json_decode($responseData, true);
-                            $validationData = $jsonData['data'];
-                            $ref_payco = $validationData['x_ref_payco'];
+                      
+                        if (!$ref_payco) {
+                            $explode=explode('=',$order_id);
+                            $ref_payco=$explode[1];
+                            $explode2 = explode('?', $order_id );
+                            $order_id=$explode2[0];
+                        }
+                        $url = 'https://secure.epayco.co/validation/v1/reference/'.$ref_payco;
+                        $response = wp_remote_get(  $url );
+                        $body = wp_remote_retrieve_body( $response ); 
+                        $jsonData = @json_decode($body, true);
+                        $validationData = $jsonData['data'];
+                        $x_test_request = trim($validationData['x_test_request']);
+                        //Validamos la firma
+                        if ($order_id!="" && $ref_payco!="") {
+                            $signature = hash('sha256',
+                                 trim($this->epayco_customerid).'^'
+                                .trim($this->epayco_secretkey).'^'
+                                .trim($validationData['x_ref_payco']).'^'
+                                .trim($validationData['x_transaction_id']).'^'
+                                .trim($validationData['x_amount']).'^'
+                                .trim($validationData['x_currency_code'])
+                            );
                         }
 
                     }
-                        //Validamos la firma
-                    if ($order_id!="" && $ref_payco!="") {
-                        $order = new WC_Order($order_id);
-                        $signature = hash('sha256',
-                             trim($this->epayco_customerid).'^'
-                            .trim($this->epayco_secretkey).'^'
-                            .trim($validationData['x_ref_payco']).'^'
-                            .trim($validationData['x_transaction_id']).'^'
-                            .trim($validationData['x_amount']).'^'
-                            .trim($validationData['x_currency_code'])
-                        );
-                    }
+                    
+                    $order = new WC_Order($order_id);
+                        
 
                     $message = '';
                     $messageClass = '';
                     
                     $current_state = $order->get_status();
-              
+                    $isTestTransaction = $x_test_request == 'TRUE' ? "yes" : "no";
+                    update_option('epaycor_order_status', $isTestTransaction);
+                    $isTestMode = get_option('epaycor_order_status') == "yes" ? "true" : "false";
+
+
                     if($signature ==trim($validationData['x_signature'])){
                           switch ((int)$validationData['x_cod_transaction_state']) {
                             case 1:{
@@ -508,34 +580,71 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                     EpaycoOrderAgregador::updateStockDiscount($order_id,1);
                                         
                                 }
-                                $message = 'Pago exitoso';
-                                $messageClass = 'woocommerce-message';
-                                $order->payment_complete($validationData['x_ref_payco']);
-                                $order->update_status('completed');
-                                $order->add_order_note('Pago exitoso');
+                                if($isTestMode=="true"){
+                                    $message = 'Pago exitoso Prueba';
+                                    switch ($this->epayco_endorder_state ){
+                                        case 'epayco-processing':{
+                                            $orderStatus ='epayco_processing';
+                                        }break;
+                                        case 'epayco-completed':{
+                                            $orderStatus ='epayco_completed';
+                                        }break;
+                                        case 'processing':{
+                                            $orderStatus ='processing_test';
+                                        }break;
+                                        case 'completed':{
+                                            $orderStatus ='completed_test';
+                                        }break;
+                                    }
+                                }else{
+                                    $message = 'Pago exitoso';
+                                    $orderStatus = $this->epayco_endorder_state;
+                                }
+                                $order->payment_complete($x_ref_payco);
+                                $order->update_status($orderStatus);
+                                $order->add_order_note($message);
+                                echo "1";
                                 
                             }break;
                             case 2: {
-                                if($current_state=="epayco-failed" ||
-                                        $current_state =="epayco-cancelled" || 
-                                        $current_state=="failed" ||
+                                 if($isTestMode=="true"){
+                                    if($current_state =="epayco_failed" ||
+                                        $current_state =="epayco_cancelled" ||
+                                        $current_state =="failed" ||
+                                        $current_state == "epayco_processing" ||
+                                        $current_state == "epayco_completed" ||
+                                        $current_state == "processing_test" ||
+                                        $current_state == "completed_test"
+                                    ){
+                                        $order->update_status('epayco_cancelled');
+                                        $order->add_order_note('Pago fallido Prueba');
+                                    }else{
+                                        $message = 'Pago rechazado Prueba: ' .$x_ref_payco;
+                                        $messageClass = 'woocommerce-error';
+                                        $order->update_status('epayco_cancelled');
+                                        $order->add_order_note($message);
+                                        $this->restore_order_stock($order->id);
+                                    }
+                                }else{
+                                    if($current_state =="epayco-failed" ||
+                                        $current_state =="epayco-cancelled" ||
+                                        $current_state =="failed" ||
                                         $current_state == "epayco-processing" ||
                                         $current_state == "epayco-completed" ||
                                         $current_state == "processing" ||
-                                        $current_state =="cancelled" || 
                                         $current_state == "completed"
                                     ){
-                                        $order->update_status('cancelled');
+                                        $order->update_status('epayco-cancelled');
                                         $order->add_order_note('Pago fallido');
-                                    } else {
+                                    }else{
                                         $message = 'Pago rechazado' .$x_ref_payco;
                                         $messageClass = 'woocommerce-error';
-                                        $order->update_status('cancelled');
+                                        $order->update_status('epayco-cancelled');
                                         $order->add_order_note('Pago fallido');
-                                        if($current_state=="pending"){
-                                            $this->restore_order_stock($order->id);
-                                        }
+                                        $this->restore_order_stock($order->id);
                                     }
+                                }
+                                echo "2";
 
                             }break;
                             case 3:{
@@ -546,84 +655,164 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                     EpaycoOrderAgregador::updateStockDiscount($order_id,1);
                                 }
                                
-                                $message = 'Pago pendiente de aprobación';
-                                $messageClass = 'woocommerce-info';
-                                $order->update_status('on-hold');
-                                $order->add_order_note('Pago pendiente');
+                                if($isTestMode=="true"){
+                                    $message = 'Pago pendiente de aprobación Prueba';
+                                    $orderStatus = "epayco_on_hold";
+                                }else{
+                                    $message = 'Pago pendiente de aprobación';
+                                    $orderStatus = "epayco-on-hold";
+                                }
+                                $order->update_status($orderStatus);
+                                $order->add_order_note($message);
 
                             }break;
                             case 4:{
-                                if($current_state == "epayco-processing" ||
-                                    $current_state == "epayco-completed" ||
-                                    $current_state =="epayco-cancelled" ||
-                                    $current_state == "epayco-failed" ||
-                                    $current_state =="cancelled" ||
-                                    $current_state == "processing" ||
-                                    $current_state =="failed" ||
-                                    $current_state == "completed"){
-                                } else {
-                                    $message = 'Pago fallido' .$x_ref_payco;
-                                    $messageClass = 'woocommerce-error';
-                                    $order->update_status('failed');
-                                    $order->add_order_note('Pago fallido');
-                                    $this->restore_order_stock($order->id);
+                                if($isTestMode=="true"){
+                                    if($current_state =="epayco_failed" ||
+                                        $current_state =="epayco_cancelled" ||
+                                        $current_state =="failed" ||
+                                        $current_state == "epayco_processing" ||
+                                        $current_state == "epayco_completed" ||
+                                        $current_state == "processing_test" ||
+                                        $current_state == "completed_test"
+                                    ){
+                                        $order->update_status('epayco_failed');
+                                        $order->add_order_note('Pago fallido Prueba');
+                                    }else{
+                                        $message = 'Pago Fallido Prueba: ' .$x_ref_payco;
+                                        $messageClass = 'woocommerce-error';
+                                        $order->update_status('epayco_failed');
+                                        $order->add_order_note($message);
+                                        $this->restore_order_stock($order->id);
+                                    }
+                                }else{
+                                    if($current_state =="epayco-failed" ||
+                                        $current_state =="epayco-cancelled" ||
+                                        $current_state =="failed" ||
+                                        $current_state == "epayco-processing" ||
+                                        $current_state == "epayco-completed" ||
+                                        $current_state == "processing" ||
+                                        $current_state == "completed"
+                                    ){
+                                        $order->update_status('epayco-failed');
+                                        $order->add_order_note('Pago fallido');
+                                    }else{
+                                        $message = 'Pago Fallido' .$x_ref_payco;
+                                        $messageClass = 'woocommerce-error';
+                                        $order->update_status('epayco-failed');
+                                        $order->add_order_note('Pago fallido');
+                                        $this->restore_order_stock($order->id);
+                                    }
                                 }
+                                echo "4";
+                            }break;
+                            case 6:{
+                                $message = 'Pago Reversada' .$x_ref_payco;
+                                $messageClass = 'woocommerce-error';
+                                $order->update_status('refunded');
+                                $order->add_order_note('Pago Reversado');
+                                $this->restore_order_stock($order->id);
+                                echo "6";
                             }break;
                             case 10: {
-                                if($current_state=="epayco-failed" ||
-                                       $current_state =="epayco-cancelled" || 
-                                       $current_state=="failed" ||
-                                       $current_state == "epayco-processing" ||
-                                       $current_state == "epayco-completed" ||
-                                       $current_state == "processing" ||
-                                       $current_state =="cancelled" || 
-                                       $current_state == "completed"
-                                   ){
-                                       $order->update_status('failed');
-                                       $order->add_order_note('Pago fallido o Abandonado');
-                                   } else {
-                                       $message = 'Pago rechazado' .$x_ref_payco;
-                                       $messageClass = 'woocommerce-error';
-                                       $order->update_status('failed');
-                                       $order->add_order_note('Pago fallido o Abandonado');
-                                       $this->restore_order_stock($order->id);
-                                   }
+                                if($isTestMode == "true"){
+                                    if($current_state =="epayco_failed" ||
+                                        $current_state =="epayco_cancelled" ||
+                                        $current_state =="failed" ||
+                                        $current_state == "epayco_processing" ||
+                                        $current_state == "epayco_completed" ||
+                                        $current_state == "processing_test" ||
+                                        $current_state == "completed_test"
+                                    ){
+                                        $order->update_status('epayco_failed');
+                                        $order->add_order_note('Pago fallido Prueba');
+                                    }else{
+                                        $message = 'Pago Fallido Prueba: ' .$x_ref_payco;
+                                        $messageClass = 'woocommerce-error';
+                                        $order->update_status('epayco_failed');
+                                        $order->add_order_note($message);
+                                        $this->restore_order_stock($order->id);
+                                    }
+                                }else{
+                                    
+                                    if($current_state =="epayco-failed" ||
+                                        $current_state =="epayco-cancelled" ||
+                                        $current_state =="failed" ||
+                                        $current_state == "epayco-processing" ||
+                                        $current_state == "epayco-completed" ||
+                                        $current_state == "processing" ||
+                                        $current_state == "completed"
+                                    ){
+                                        $order->update_status('epayco-failed');
+                                        $order->add_order_note('Pago fallido');
+                                    }else{
+                                        $message = 'Pago Fallido' .$x_ref_payco;
+                                        $messageClass = 'woocommerce-error';
+                                        $order->update_status('epayco-failed');
+                                        $order->add_order_note('Pago fallido');
+                                        $this->restore_order_stock($order->id);
+                                    }
+                                }
+                                echo "10";
 
                            }break;
                            case 11: {
-                                if($current_state=="epayco-failed" ||
-                                       $current_state =="epayco-cancelled" || 
-                                       $current_state=="failed" ||
-                                       $current_state == "epayco-processing" ||
-                                       $current_state == "epayco-completed" ||
-                                       $current_state == "processing" ||
-                                       $current_state =="cancelled" || 
-                                       $current_state == "completed"
-                                   ){
-                                       $order->update_status('failed');
-                                       $order->add_order_note('Pago fallido o Abandonado');
-                                   } else {
-                                       $message = 'Pago rechazado' .$x_ref_payco;
-                                       $messageClass = 'woocommerce-error';
-                                       $order->update_status('failed');
-                                       $order->add_order_note('Pago fallido o Abandonado');
-                                       $this->restore_order_stock($order->id);
-                                   }
+                                if($isTestMode == "true"){
+                                    if($current_state =="epayco_failed" ||
+                                        $current_state =="epayco_cancelled" ||
+                                        $current_state =="failed" ||
+                                        $current_state == "epayco_processing" ||
+                                        $current_state == "epayco_completed" ||
+                                        $current_state == "processing_test" ||
+                                        $current_state == "completed_test"
+                                    ){
+                                        $order->update_status('epayco_cancelled');
+                                        $order->add_order_note('Pago Cancelado Prueba');
+                                    }else{
+                                        $message = 'Pago Cancelado Prueba: ' .$x_ref_payco;
+                                        $messageClass = 'woocommerce-error';
+                                        $order->update_status('epayco_cancelled');
+                                        $order->add_order_note($message);
+                                        $this->restore_order_stock($order->id);
+                                    }
+                                }else{
+                                    
+                                    if($current_state =="epayco-failed" ||
+                                        $current_state =="epayco-cancelled" ||
+                                        $current_state =="failed" ||
+                                        $current_state == "epayco-processing" ||
+                                        $current_state == "epayco-completed" ||
+                                        $current_state == "processing" ||
+                                        $current_state == "completed"
+                                    ){
+                                        $order->update_status('epayco-cancelled');
+                                        $order->add_order_note('Pago Cancelado');
+                                    }else{
+                                        $message = 'Pago Cancelado' .$x_ref_payco;
+                                        $messageClass = 'woocommerce-error';
+                                        $order->update_status('epayco-cancelled');
+                                        $order->add_order_note('Pago Cancelado');
+                                        $this->restore_order_stock($order->id);
+                                    }
+                                }
+                                echo "11";
 
                            }break;
                             default:{
                                 if(
-                                    $current_state == "epayco-processing" ||
-                                    $current_state == "epayco-completed" ||
-                                    $current_state == "processing" ||
+                                    $current_state == "epayco-processing" || 
+                                    $current_state == "epayco-completed" || 
+                                    $current_state == "processing" || 
                                     $current_state == "completed"){
-                                } else{
+
+                                    }else{
                                     $message = 'Pago '.$_REQUEST['x_transaction_state'] . $x_ref_payco;
                                     $messageClass = 'woocommerce-error';
-                                    $order->update_status('failed');
-                                    $order->add_order_note($message);
+                                    $order->update_status('epayco-failed');
+                                    $order->add_order_note('Pago fallido o abandonado');
                                     $this->restore_order_stock($order->id);
-                                }
+                                    }
+                                    echo "default";
 
                             }break;
                         }
@@ -861,6 +1050,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 'epayco_lang' . $idSuffix => array(
                     'title' => $namePrefix . __('Idioma del Checkout', 'epayco'),
                     'type' => 'select',
+                    'css' =>'line-height: inherit',
                     'description' => __('Habilite para realizar pruebas', 'epayco'),
                       'options' => array('es'=>"Español","en"=>"Inglés"),
                     'desc_tip' => true
@@ -868,10 +1058,23 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 'epayco_type_checkout' . $idSuffix => array(
                     'title' => $namePrefix . __('Tipo Checkout', 'epayco'),
                     'type' => 'select',
+                    'css' =>'line-height: inherit',
                     'label' => __('Seleccione un tipo de Checkout:', 'epayco'),
                     'description' => __('(Onpage Checkout, el usuario al pagar permanece en el sitio) ó (Standart Checkout, el usario al pagar es redireccionado a la pasarela de ePayco)', 'epayco'),
                     'options' => array('false'=>"Onpage Checkout","true"=>"Standart Checkout"),
                     'desc_tip' => true
+                ),
+                'epayco_endorder_state' => array(
+                        'title' => __('Estado Final del Pedido', 'epayco'),
+                        'type' => 'select',
+                        'css' =>'line-height: inherit',
+                        'description' => __('Seleccione el estado del pedido que se aplicará a la hora de aceptar y confirmar el pago de la orden', 'epayco'),
+                        'options' => array(
+                            'epayco-processing'=>"ePayco Procesando Pago",
+                            "epayco-completed"=>"ePayco Pago Completado",
+                            'processing'=>"Procesando",
+                            "completed"=>"Completado"
+                        ),
                 )
              
             );
