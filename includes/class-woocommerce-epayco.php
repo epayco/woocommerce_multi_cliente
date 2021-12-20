@@ -612,7 +612,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     if ($order_id != "" && $x_ref_payco != "") {
                         $authSignature = $this->authSignature($x_ref_payco, $x_transaction_id, $x_amount, $x_currency_code);
                     }
-                  
+                    
                     if($authSignature == $signature && $validation){
                           switch ($x_cod_transaction_state) {
                             case 1:{
@@ -870,7 +870,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         }
 
                     }else{
-                        if($isTestMode == "true"){
+                        
+                       if($isTestMode == "true"){
                             if($current_state =="epayco_failed" ||
                                 $current_state =="epayco_cancelled" ||
                                 $current_state =="epayco-cancelled" ||
@@ -880,10 +881,32 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                 $current_state == "processing_test" ||
                                 $current_state == "completed_test"
                             ){}else{
-                                
-                                $order->update_status('epayco_failed');
+                               
+                                if($x_cod_transaction_state == 1){
+                                $message = 'Pago exitoso Prueba';
+                                switch ($this->epayco_endorder_state ){
+                                        case 'epayco-processing':{
+                                            $orderStatus ='epayco_processing';
+                                        }break;
+                                        case 'epayco-completed':{
+                                            $orderStatus ='epayco_completed';
+                                        }break;
+                                        case 'processing':{
+                                            $orderStatus ='processing_test';
+                                        }break;
+                                        case 'completed':{
+                                            $orderStatus ='completed_test';
+                                        }break;
+                                    }
+                         
+                                    $order->update_status($orderStatus);
+                                $order->add_order_note($message);
+                                $this->restore_order_stock($order->id);
+                                }else{
+                               $order->update_status('epayco_failed');
                                 $order->add_order_note('Pago fallido o abandonado');
                                 $this->restore_order_stock($order->id);
+                                }
                             }
                         }else{
                            if($current_state =="epayco-failed" ||
@@ -894,9 +917,14 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                 $current_state == "processing" ||
                                 $current_state == "completed"
                             ){}else{
+                                if($x_cod_transaction_state == 1){
+                                $message = 'Pago exitoso';
+                                $orderStatus = $this->epayco_endorder_state;
+                                }else{ 
                                 $order->update_status('epayco-failed');
                                 $order->add_order_note('Pago fallido o abandonado');
                                 $this->restore_order_stock($order->id);
+                                } 
                             } 
                         }
                         
