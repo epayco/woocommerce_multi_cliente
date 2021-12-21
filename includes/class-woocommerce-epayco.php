@@ -880,7 +880,28 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                 $current_state == "epayco_completed" ||
                                 $current_state == "processing_test" ||
                                 $current_state == "completed_test"
-                            ){}else{
+                            ){
+                                if($x_cod_transaction_state == 1){
+                                    $message = 'Pago exitoso Prueba';
+                                    switch ($this->epayco_endorder_state ){
+                                            case 'epayco-processing':{
+                                                $orderStatus ='epayco_processing';
+                                            }break;
+                                            case 'epayco-completed':{
+                                                $orderStatus ='epayco_completed';
+                                            }break;
+                                            case 'processing':{
+                                                $orderStatus ='processing_test';
+                                            }break;
+                                            case 'completed':{
+                                                $orderStatus ='completed_test';
+                                            }break;
+                                        }
+                                         $order->update_status($orderStatus);
+                                    $order->add_order_note($message);
+                                    $this->restore_order_stock($order->id);
+                                    }
+                            }else{
                                
                                 if($x_cod_transaction_state == 1){
                                 $message = 'Pago exitoso Prueba';
