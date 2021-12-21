@@ -899,7 +899,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                         }
                                          $order->update_status($orderStatus);
                                     $order->add_order_note($message);
-                                    $this->restore_order_stock($order->id);
+                                    
                                     }
                             }else{
                                
