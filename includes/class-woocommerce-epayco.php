@@ -920,9 +920,11 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                         }break;
                                     }
                          
-                                    $order->update_status($orderStatus);
+                                $order->update_status($orderStatus);
                                 $order->add_order_note($message);
-                                $this->restore_order_stock($order->id);
+                                if($current_state !=  "epayco_on_hold"){
+                                    $this->restore_order_stock($order->id);
+                                }
                                 }else{
                                $order->update_status('epayco_failed');
                                 $order->add_order_note('Pago fallido o abandonado');
