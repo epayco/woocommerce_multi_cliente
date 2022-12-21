@@ -4,7 +4,7 @@
 
 ## Versiones
 * [ePayco plugin WooCommerce v4.x](https://github.com/epayco/woocommerce_multi_cliente).
-
+* [ePayco plugin WooCommerce v5.0.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v5.0.0).
 
 ## Tabla de contenido
 
