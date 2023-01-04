@@ -270,44 +270,44 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
     function process_payment($order_id)
     {
 
-          $order = new WC_Order($order_id);
-                $order->reduce_order_stock();
-                if (version_compare( WOOCOMMERCE_VERSION, '2.1', '>=')) {
-                    return array(
-                        'result'    => 'success',
-                        'redirect'  => add_query_arg('order-pay', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay' ))))
-                    );
-                } else {
-                    return array(
-                        'result'    => 'success',
-                        'redirect'  => add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay' ))))
-                    );
-                }
+        $order = new WC_Order($order_id);
+        $order->reduce_order_stock();
+        if (version_compare( WOOCOMMERCE_VERSION, '2.1', '>=')) {
+            return array(
+                'result'    => 'success',
+                'redirect'  => add_query_arg('order-pay', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay' ))))
+            );
+        } else {
+            return array(
+                'result'    => 'success',
+                'redirect'  => add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay' ))))
+            );
+        }
     }
 
-        function get_pages($title = false, $indent = true) {
-                $wp_pages = get_pages('sort_column=menu_order');
-                $page_list = array();
-                if ($title) $page_list[] = $title;
-                foreach ($wp_pages as $page) {
-                    $prefix = '';
-                    // show indented child pages?
-                    if ($indent) {
-                        $has_parent = $page->post_parent;
-                        while($has_parent) {
-                            $prefix .=  ' - ';
-                            $next_page = get_page($has_parent);
-                            $has_parent = $next_page->post_parent;
-                        }
-                    }
-                    // add to page list array array
-                    $page_list[$page->ID] = $prefix . $page->post_title;
+    function get_pages($title = false, $indent = true) {
+        $wp_pages = get_pages('sort_column=menu_order');
+        $page_list = array();
+        if ($title) $page_list[] = $title;
+        foreach ($wp_pages as $page) {
+            $prefix = '';
+            // show indented child pages?
+            if ($indent) {
+                $has_parent = $page->post_parent;
+                while($has_parent) {
+                    $prefix .=  ' - ';
+                    $next_page = get_page($has_parent);
+                    $has_parent = $next_page->post_parent;
                 }
-                return $page_list;
             }
+            // add to page list array array
+            $page_list[$page->ID] = $prefix . $page->post_title;
+        }
+        return $page_list;
+    }
 
 
-     public function receipt_page($order_id)
+        public function receipt_page($order_id)
             {
                 global $woocommerce;
                 $order = new WC_Order($order_id);
@@ -365,7 +365,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 
                 $order_number_meta = get_post_meta( $order_id, '_alg_wc_full_custom_order_number', true );
                 $orderId= (!empty($order->get_data()["number"]))?$order->get_data()["number"] : $order->get_id();
-                
+                               
                echo('
                     <style>
                         .epayco-title{
@@ -1328,7 +1328,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         'id'       => 'alg_wc_custom_order_numbers_counter',
                         'default'  => 1,
                         'type'     => 'number',
-                       // 'css' =>'display: none',
+                        'css' =>'display: none',
                     ),
                     'alg_wc_custom_order_numbers_prefix' => array(
                         'title'    => __( 'Order number custom prefix', 'epayco' ),
@@ -1569,9 +1569,13 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     if ( $order_timestamp > $time ) {
                         return;
                     }
+                    $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                    if ( '' === $custom_order_numbers_prefix ) {
+                        $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                    }
                     $con_order_number = apply_filters(
                         'alg_wc_custom_order_numbers',
-                        sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $order_number_meta ),
+                        sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $order_number_meta ),
                         'value',
                         array(
                             'order_timestamp'   => $order_timestamp,
@@ -1604,7 +1608,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     }
                     $con_order_number = apply_filters(
                         'alg_wc_custom_order_numbers',
-                        sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $order_number_meta ),
+                        sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $order_number_meta ),
                         'value',
                         array(
                             'order_timestamp'   => $order_timestamp,
@@ -1634,6 +1638,10 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     update_option( 'alg_custom_order_number_no_old_con_without_meta_key', 'yes' );
                     return;
                 }
+                $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                if ( '' === $custom_order_numbers_prefix ) {
+                    $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                }
                 foreach ( $loop_orders->posts as $order_ids ) {
                     $order_id              = $order_ids->ID;
                     $order_number_meta     = $order_id;
@@ -1646,7 +1654,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     }
                     $con_order_number = apply_filters(
                         'alg_wc_custom_order_numbers',
-                        sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $order_number_meta ),
+                        sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $order_number_meta ),
                         'value',
                         array(
                             'order_timestamp'   => $order_timestamp,
@@ -1831,11 +1839,16 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         if ( '' === $order_number_meta ) {
                             $order_number_meta = $order_id;
                         }
+                        
                         $is_wc_version_below_3 = version_compare( get_option( 'woocommerce_version', null ), '3.0.0', '<' );
                         $order_timestamp       = strtotime( ( $is_wc_version_below_3 ? $order->order_date : $order->get_date_created() ) );
+                        $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                        if ( '' === $custom_order_numbers_prefix ) {
+                            $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                        }
                         $full_order_number     = apply_filters(
                             'alg_wc_custom_order_numbers',
-                            sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $order_number_meta ),
+                            sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $order_number_meta ),
                             'value',
                             array(
                                 'order_timestamp'   => $order_timestamp,
@@ -1888,9 +1901,13 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     if ( isset( $_POST['alg_wc_custom_order_number'] ) ) { // phpcs:ignore
                         $current_order_number = sanitize_text_field( wp_unslash( $_POST['alg_wc_custom_order_number'] ) ); // phpcs:ignore
                     }
+                    $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                    if ( '' === $custom_order_numbers_prefix ) {
+                        $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                    }
                     $full_custom_order_number = apply_filters(
                         'alg_wc_custom_order_numbers',
-                        sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $current_order_number ),
+                        sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $current_order_number ),
                         'value',
                         array(
                             'order_timestamp'   => $order_timestamp,
@@ -2039,9 +2056,13 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                             if ( '' === $order_number_meta ) {
                                 $order_number_meta = $order_id;
                             }
+                            $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                            if ( '' === $custom_order_numbers_prefix ) {
+                                $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                            }
                             $order_number = apply_filters(
                                 'alg_wc_custom_order_numbers',
-                                sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $order_number_meta ),
+                                sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $order_number_meta ),
                                 'value',
                                 array(
                                     'order_timestamp'   => $order_timestamp,
@@ -2070,13 +2091,19 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     } else {
                         $new_orders_updated = get_post_meta( $order_id, 'new_orders_updated', true );
                     }
+                    
+                    $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                    if ( '' === $custom_order_numbers_prefix ) {
+                        $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                    }
+                    
                     if ( 'yes' !== $new_orders_updated ) {
                         $counter_type = 'sequential';
                         if ( 'order_id' === $counter_type ) {
                             $order_number_meta = $order_id;
                             $order_number      = apply_filters(
                                 'alg_wc_custom_order_numbers',
-                                sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $order_number_meta ),
+                                sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $order_number_meta ),
                                 'value',
                                 array(
                                     'order_timestamp'   => $order_timestamp,
@@ -2094,11 +2121,17 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                             return $order_number;
                         }
                     }
+                    
+                    $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                    if ( '' === $custom_order_numbers_prefix ) {
+                        $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                    }
+                    
                     if ( '' === $order_number_meta ) {
                         $order_number_meta = $order_id;
                         $order_number_meta = apply_filters(
                             'alg_wc_custom_order_numbers',
-                            sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $order_number_meta ),
+                            sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $order_number_meta ),
                             'value',
                             array(
                                 'order_timestamp'   => $order_timestamp,
@@ -2116,9 +2149,15 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     if ( '' === $order_number_meta ) {
                         $order_number_meta = $order_id;
                     }
+                     
+                    $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                    if ( '' === $custom_order_numbers_prefix ) {
+                        $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                    }
+                    
                     $order_number = apply_filters(
                         'alg_wc_custom_order_numbers',
-                        sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $order_number_meta ),
+                        sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $order_number_meta ),
                         'value',
                         array(
                             'order_timestamp'   => $order_timestamp,
@@ -2181,11 +2220,17 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                 array( 'option_value' => ( $current_order_number + 1 ) ),
                                 array( 'option_name' => 'alg_wc_custom_order_numbers_counter' )
                             );
+                            
+                            $custom_order_numbers_prefix = $this->alg_wc_custom_order_numbers_prefix;
+                            if ( '' === $custom_order_numbers_prefix ) {
+                                $custom_order_numbers_prefix = get_bloginfo( 'name' )." : ".$this->alg_wc_custom_order_numbers_prefix;
+                            }
+                            
                             $current_order_number_new = $current_order_number + 1;
                             if ( null !== $result_update || $current_order_number_new === $result_select->option_value ) {
                                 $full_custom_order_number = apply_filters(
                                     'alg_wc_custom_order_numbers',
-                                    sprintf( '%s%s', do_shortcode( $this->alg_wc_custom_order_numbers_prefix ), $current_order_number ),
+                                    sprintf( '%s%s', do_shortcode( $custom_order_numbers_prefix ), $current_order_number ),
                                     'value',
                                     array(
                                         'order_timestamp'   => $order_timestamp,
