@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Epayco Payment
  * Description: Epayco payment for WooCommerce
- * Version: 5.x
+ * Version: 5.1.x
  * Author: Epayco
  * Author URI: http://epayco.co
  * License: LGPL 3.0
