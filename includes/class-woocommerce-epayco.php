@@ -3,7 +3,7 @@ use Automattic\WooCommerce\Utilities\OrderUtil;
 use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 class WC_Gateway_Epayco extends WC_Payment_Gateway
 {
-    private $pluginVersion = '4.9.1';
+    private $pluginVersion = '5.1.0';
     private $epayco_feedback;
     private $sandbox;
     private $enable_for_shipping;
@@ -489,7 +489,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         <div id="epayco_form" style="text-align: center;">
                             <form>
                             <script
-                                src="https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod.js?version=1643645084821"
+                                src="https://checkout.epayco.co/checkout.js"
                                 class="epayco-button"
                                 data-epayco-key="%s"
                                 data-epayco-test="%s"
@@ -615,7 +615,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                             $explode2 = explode('?', $order_id );
                             $order_id=$explode2[0];
                         }
-                        $url = 'https://secure.epayco.io/validation/v1/reference/'.$ref_payco;
+                        $url = 'https://secure.epayco.co/validation/v1/reference/'.$ref_payco;
                         $response = wp_remote_get(  $url );
                         $body = wp_remote_retrieve_body( $response ); 
                         $jsonData = @json_decode($body, true);
