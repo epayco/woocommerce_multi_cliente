@@ -19,6 +19,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
         $this->epayco_customerid = $this->get_option('epayco_customerid');
         $this->epayco_secretkey = $this->get_option('epayco_secretkey');
         $this->epayco_publickey = $this->get_option('epayco_publickey');
+        $this->epayco_privatekey = $this->get_option('epayco_privatekey');
         $this->epayco_description = $this->get_option('epayco_description');
         $this->epayco_testmode = $this->get_option('epayco_testmode');
         $this->epayco_lang = $this->get_option('epayco_lang');
@@ -75,7 +76,9 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
          add_action('woocommerce_receipt_' . $this->id, array(&$this, 'receipt_page'));
          add_action('ePayco_init', array( $this, 'ePayco_successful_request'));
             $this->init_OpenEpayco();
-            
+        do_action('change_status_action');
+
+        add_action('woocommerce_order_status_' . $status, [$this,'woocommerce_order_status_other'], 10, 1);
             
             
     }
@@ -152,9 +155,9 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         </div>
 
                         <div style ="color: #31708f; background-color: #d9edf7; border-color: #bce8f1;padding: 10px;border-radius: 5px;">
-                            <b>Este modulo le permite aceptar pagos seguros por la plataforma de pagos ePayco</b>
-                            <br>Si el cliente decide pagar por ePayco, el estado del pedido cambiara a ePayco Esperando Pago
-                            <br>Cuando el pago sea Aceptado o Rechazado ePayco envia una configuracion a la tienda para cambiar el estado del pedido.
+                        Este módulo le permite aceptar pagos seguros por la plataforma de pagos ePayco.
+                            Si el cliente decide pagar por ePayco, el estado del pedido cambiará a <b> Esperando Pago</b>.
+                            <br>Cuando el pago sea Aceptado o Rechazado ePayco envía una confirmación a la tienda para cambiar el estado del pedido.
                         </div>
 
                         <div class="panel-body" style="padding: 15px 0;background: #fff;margin-top: 15px;border-radius: 5px;border: 1px solid #dcdcdc;border-top: 1px solid #dcdcdc;">
@@ -334,7 +337,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 $order = new WC_Order($order_id);
                 $tax=$order->get_total_tax();
                 $tax=round($tax,2);
-                
+                $myIp = $this->getIP();
                 if((int)$tax>0){
                     $base_tax=$order->get_total()-$tax;
                 }else{
@@ -486,33 +489,14 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         <p style="text-align: center;" class="epayco-title">
                                 '.$message.'
                         </p>
+                        <center>
+                        <a id="btn_epayco" href="#">
+                            <img src="'.$button.'">
+                        </a>
+                        </center>    
                         <div id="epayco_form" style="text-align: center;">
                             <form>
-                            <script
-                                src="https://checkout.epayco.co/checkout.js"
-                                class="epayco-button"
-                                data-epayco-key="%s"
-                                data-epayco-test="%s"
-                                data-epayco-amount="%s"
-                                data-epayco-tax="%s"
-                                data-epayco-tax-base="%s"
-                                data-epayco-name="%s"
-                                data-epayco-description="%s"
-                                data-epayco-currency="%s"                         
-                                data-epayco-invoice="%s" 
-                                data-epayco-extra1="%s"
-                                data-epayco-country="%s"
-                                data-epayco-external="%s"                       
-                                data-epayco-response="%s"
-                                data-epayco-confirmation="%s"
-                                data-epayco-email-billing="%s"
-                                data-epayco-name-billing="%s"
-                                data-epayco-address-billing="%s"
-                                data-epayco-lang="%s"
-                                data-epayco-mobilephone-billing="%s"
-                                data-epayco-button="'.$button.'"
-                                data-epayco-autoclick="true"
-                                >
+                            <script src="https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod.js">
                             </script>
                             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
                             <script>
@@ -528,12 +512,84 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                     return false;
                                 }
                             });
+                            const apiKey = "%s";
+                            var data = {
+                                test: "%s".toString(),
+                                amount: "%s".toString(),
+                                tax: "%s".toString(),
+                                tax_base: "%s".toString(),
+                                taxIco: "0",
+                                name: "%s",
+                                description: "%s",
+                                currency: "%s",
+                                invoice: "%s",
+                                extra1: "%s",
+                                country: "%s",
+                                external: "%s",
+                                response: "%s",
+                                confirmation: "%s",
+                                email_billing: "%s",
+                                name_billing: "%s",
+                                address_billing: "%s",
+                                lang: "%s",
+                                mobilephone_billing: "%s",
+                                autoclick: "true",
+                                ip: "%s"
+                            }
+                            debugger
+                            const privateKey = "%s";
+                            var openChekout = function () {
+                                  if(localStorage.getItem("invoicePayment") == null){
+                                   localStorage.setItem("invoicePayment", data.invoice);
+                                     makePayment(privateKey,apiKey,data, data.external == "true"?true:false)
+                                   }else{
+                                       if(localStorage.getItem("invoicePayment") != data.invoice){
+                                           localStorage.removeItem("invoicePayment");
+                                           localStorage.setItem("invoicePayment", data.invoice);
+                                             makePayment(privateKey,apiKey,data, data.external == "true"?true:false)
+                                       }else{
+                                            makePayment(privateKey,apiKey,data, data.external == "true"?true:false)
+                                       }
+                                   }
+                            }
+                            var makePayment = function (privatekey, apikey, info, external) {
+                                const headers = { "Content-Type": "application/json" } ;
+                                headers["privatekey"] = privatekey;
+                                headers["apikey"] = apikey;
+                                var payment =   function (){
+                                    return  fetch("https://cms.epayco.io/checkout/payment/session", {
+                                        method: "POST",
+                                        body: JSON.stringify(info),
+                                        headers
+                                    })
+                                        .then(res =>  res.json())
+                                        .catch(err => err);
+                                }
+                                payment()
+                                    .then(session => {
+                                        if(session.data.sessionId != undefined){
+                                            localStorage.removeItem("sessionPayment");
+                                            localStorage.setItem("sessionPayment", session.data.sessionId);
+                                            const handlerNew = window.ePayco.checkout.configure({
+                                                sessionId: session.data.sessionId,
+                                                external: external,
+                                            });
+                                            handlerNew.openNew()
+                                        }
+                                    })
+                                    .catch(error => {
+                                        error.message;
+                                    });
+                            }
+                            var bntPagar = document.getElementById("btn_epayco");
+                            bntPagar.addEventListener("click", openChekout);
+                            openChekout()
                             </script>
                         </form>
                         </div>       
-                ',$this->epayco_publickey,$test_mode,$order->get_total(),$tax,$base_tax, $descripcion, 
+                ',trim($this->epayco_publickey),$test_mode,$order->get_total(),$tax,$base_tax, $descripcion, 
                 $descripcion, $currency, $orderId, $order->get_id(), $basedCountry, $external_type, $redirect_url,$confirm_url,
-                    $email_billing,$name_billing,$address_billing,$epayco_lang,$phone_billing);
+                    $email_billing,$name_billing,$address_billing,$epayco_lang,$phone_billing,$myIp,trim($this->epayco_privatekey));
                 
             }
 
@@ -578,7 +634,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     $order_id="";
                     $ref_payco="";
                     $signature="";
-
+                    $isConfirmation = sanitize_text_field($_GET['confirmation']) == 1;
                     if(isset($_REQUEST['x_signature'])){
                        $order_id = trim(sanitize_text_field($_GET['order_id']));
                        $x_ref_payco = trim(sanitize_text_field($_REQUEST['x_ref_payco']));
@@ -604,7 +660,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         $order_id_rpl  = str_replace('?ref_payco','',$order_id_explode);
                         $order_id = $order_id_rpl[0];
                         $ref_payco = sanitize_text_field($_GET['ref_payco']);
-                        $isConfirmation = sanitize_text_field($_GET['confirmation']) == 1;
+                        
                         if(empty($ref_payco)){
                             $ref_payco =$order_id_rpl[1];
                         }
@@ -615,7 +671,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                             $explode2 = explode('?', $order_id );
                             $order_id=$explode2[0];
                         }
-                        $url = 'https://secure.epayco.co/validation/v1/reference/'.$ref_payco;
+                        $url = 'https://secure.epayco.io/validation/v1/reference/'.$ref_payco;
                         $response = wp_remote_get(  $url );
                         $body = wp_remote_retrieve_body( $response ); 
                         $jsonData = @json_decode($body, true);
@@ -778,15 +834,21 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                     EpaycoOrderAgregador::updateStockDiscount($order_id,1);
                                 }
                                
-                                if($isTestMode=="true"){
-                                    $message = 'Pago pendiente de aprobación Prueba';
-                                    $orderStatus = "epayco_on_hold";
-                                }else{
-                                    $message = 'Pago pendiente de aprobación';
-                                    $orderStatus = "epayco-on-hold";
-                                }
+                                
+                                $message = 'Pago pendiente de aprobación';
+                                $orderStatus = "on-hold";
                                 $order->update_status($orderStatus);
                                 $order->add_order_note($message);
+                                if($isConfirmation){
+                                    if($current_state =="epayco-failed" ||
+                                        $current_state =="epayco-cancelled" ||
+                                        $current_state =="failed" ||
+                                        $current_state == "epayco_failed" ||
+                                        $current_state == "epayco_cancelled"
+                                    ){
+                                        $this->restore_order_stock($order->id,"decrease");
+                                    }
+                                }
 
                             }break;
                             case 4:{
@@ -1263,19 +1325,25 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 'epayco_customerid' . $idSuffix => array(
                     'title' => $namePrefix . __('<span class="epayco-required">P_CUST_ID_CLIENTE</span>', 'epayco'),
                     'type' => 'text',
-                    'description' => $namePrefix . __('ID de cliente que lo identifica en ePayco. Lo puede encontrar en su panel de clientes en la opción configuración.', 'epayco'),
+                    'description' => $namePrefix . __('ID de cliente que lo identifica en ePayco. Lo puede encontrar en su panel de clientes en la opción configuración', 'epayco'),
                     'desc_tip' => true
                 ),
                 'epayco_secretkey' . $idSuffix => array(
                     'title' => $namePrefix . __('<span class="epayco-required">P_KEY</span>', 'epayco'),
                     'type' => 'text',
-                    'description' => __('LLave para firmar la información enviada y recibida de ePayco. Lo puede encontrar en su panel de clientes en la opción configuración.', 'epayco'),
+                    'description' => __('LLave para firmar la información enviada y recibida de ePayco. Lo puede encontrar en su panel de clientes en la opción configuración', 'epayco'),
                     'desc_tip' => true
                 ),
                 'epayco_publickey' . $idSuffix => array(
                     'title' => $namePrefix . __('<span class="epayco-required">PUBLIC_KEY</span>', 'epayco'),
                     'type' => 'text',
-                    'description' => __('LLave para autenticar y consumir los servicios de ePayco, Proporcionado en su panel de clientes en la opción configuración.', 'ePayco'),
+                    'description' => __('LLave para autenticar y consumir los servicios de ePayco, Proporcionado en su panel de clientes en la opción configuración', 'ePayco'),
+                    'desc_tip' => true
+                ),
+                'epayco_privatekey' . $idSuffix => array(
+                    'title' => $namePrefix . __('<span class="epayco-required">PRIVATE_KEY</span>', 'epayco'),
+                    'type' => 'text',
+                    'description' => __('LLave para autenticar y consumir los servicios de ePayco, Proporcionado en su panel de clientes en la opción configuración', 'ePayco'),
                     'desc_tip' => true
                 ),
                 'epayco_testmode' . $idSuffix => array(
@@ -1299,8 +1367,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     'type' => 'select',
                     'css' =>'line-height: inherit',
                     'label' => __('Seleccione un tipo de Checkout:', 'epayco'),
-                    'description' => __('(Onpage Checkout, el usuario al pagar permanece en el sitio) ó (Standart Checkout, el usario al pagar es redireccionado a la pasarela de ePayco)', 'epayco'),
-                    'options' => array('false'=>"Onpage Checkout","true"=>"Standart Checkout"),
+                    'description' => __('(Onpage Checkout, el usuario al pagar permanece en el sitio) ó (Standard Checkout, el usario al pagar es redireccionado a la pasarela de ePayco)', 'epayco'),
+                    'options' => array('false'=>"Onpage Checkout","true"=>"Standard Checkout"),
                     'desc_tip' => true
                 ),
                 'epayco_endorder_state' => array(
