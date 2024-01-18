@@ -425,7 +425,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 
         echo sprintf('
                     <script
-                       src="https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod.js">
+                       src="https://checkout.epayco.co/checkout.js">
                     </script>
                     <script> var handler = ePayco.checkout.configure({
                         key: "%s",
@@ -451,13 +451,14 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                         email_billing: "%s",
                         mobilephone_billing: "%s",
                         autoclick: "true",
-                        ip: "%s",
-                        test: "%s".toString()
+                        //ip: "%s",
+                        //test: "%s".toString()
                     }
                     const apiKey = "%s";
                     const privateKey = "%s";
                     var openChekout = function () {
-                        if(localStorage.getItem("invoicePayment") == null){
+                        handler.open(data)
+                        /*if(localStorage.getItem("invoicePayment") == null){
                             localStorage.setItem("invoicePayment", data.invoice);
                             makePayment(privateKey,apiKey,data, data.external == "true"?true:false)
                         }else{
@@ -468,14 +469,14 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                             }else{
                                 makePayment(privateKey,apiKey,data, data.external == "true"?true:false)
                             }
-                        }
+                        }*/
                     }
                     var makePayment = function (privatekey, apikey, info, external) {
                         const headers = { "Content-Type": "application/json" } ;
                         headers["privatekey"] = privatekey;
                         headers["apikey"] = apikey;
                         var payment =   function (){
-                            return  fetch("https://cms.epayco.io/checkout/payment/session", {
+                            return  fetch("https://cms.epayco.co/checkout/payment/session", {
                                 method: "POST",
                                 body: JSON.stringify(info),
                                 headers
@@ -509,7 +510,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
             $testMode,
             $descripcion,
             $descripcion,
-            $order->get_id()."test ".$order->get_id(),
+            $order->get_id(),
             $currency,
             $order->get_total(),
             $base_tax,
@@ -529,7 +530,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
             trim($this->epayco_publickey),
             trim($this->epayco_privatekey)
         );
-        wp_enqueue_script('epayco',  'https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod.js', array(), $this->version, null);
+        wp_enqueue_script('epayco',  'https://checkout.epayco.co/checkout.js', array(), $this->version, null);
 		wc_enqueue_js('
         
 		jQuery("#btn_epayco_new").click(function(){
@@ -670,7 +671,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 
             }
 
-            $url = 'https://secure.epayco.io/validation/v1/reference/'.$ref_payco;
+            $url = 'https://secure.epayco.co/validation/v1/reference/'.$ref_payco;
             $response = wp_remote_get(  $url );
             $body = wp_remote_retrieve_body( $response );
             $jsonData = @json_decode($body, true);
@@ -1176,7 +1177,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
     {
         $username = sanitize_text_field($validationData['epayco_publickey']);
         $password = sanitize_text_field($validationData['epayco_privatey']);
-        $response = wp_remote_post( 'https://apify.epayco.io/login', array(
+        $response = wp_remote_post( 'https://apify.epayco.co/login', array(
             'headers' => array(
                 'Authorization' => 'Basic ' . base64_encode( $username . ':' . $password ),
             ),
