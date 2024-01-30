@@ -15,7 +15,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 	public function __construct() {
 
 		$this->id                   = 'epayco';
-        $this->version = '7.0.0';
+		$this->version = '7.0.0';
 		$logo_url = $this->get_option( 'logo' );
 		if ( ! empty( $logo_url ) ) {
 			$logo_url   = $this->get_option( 'logo' );
@@ -25,7 +25,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 		}
         $this->method_title         = __( 'ePayco Checkout Gateway', 'woo-epayco-gateway' );
         $this->method_description   = __( 'Acepta tarjetas de credito, depositos y transferencias.', 'woo-epayco-gateway' );
-        $this->order_button_text = __('Pagar', 'epayco_woocommerce');
+        //$this->order_button_text = __('Pay', 'epayco_woocommerce');
 		$this->has_fields           = false;
         $this->supports         = array(
             'products',
@@ -143,7 +143,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                                 </label>
                                 <input type="button" class="button-primary woocommerce-save-button validar" value="Validar">
                                 <p class="description">
-                                    Validación de llaves PUBLIC_KEY y PRIVATE_KEY
+                                    <?php esc_html_e( 'Validación de llaves PUBLIC_KEY y PRIVATE_KEY', 'woo-epayco-gateway' ); ?>
                                 </p>
                             </form>
                             <br>
@@ -155,11 +155,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                                     <center>
                                         <img src="'.$logo.'">
                                     </center>
-                                    <p><strong>Llaves de comercio inválidas</strong> </p>
-                                    <p>Las llaves Public Key, Private Key insertadas<br>
-                                        del comercio son inválidas.<br>
-                                        Consúltelas en el apartado de integraciones <br>
-                                        Llaves API en su Dashboard ePayco.</p>
+                                    <p><strong><?php esc_html_e( 'Llaves de comercio inválidas', 'woo-epayco-gateway' );?></strong> </p>
+                                    <p><?php esc_html_e( 'Las llaves Public Key, Private Key insertadas<br>del comercio son inválidas.<br>Consúltelas en el apartado de integraciones <br>Llaves API en su Dashboard ePayco.', 'woo-epayco-gateway' );?></p>
                                 </div>
                             </div>
 
@@ -181,6 +178,9 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 
 
 
+
+
+        
 	<div class="inline error">
         <p><strong><?php esc_html_e( 'Gateway Disabled', 'woo-epayco-gateway' );
 	?>
@@ -257,7 +257,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 			'epayco_testmode' => array(
 				'title'       => __( 'Sitio en pruebas', 'woo-epayco-gateway' ),
 				'type'        => 'checkbox',
-                'label' => __('Habilitar el modo de pruebas', 'epayco_woocommerce'),
+                'label' => __('Habilitar el modo de pruebas', 'woo-epayco-gateway'),
 				'description' => __( 'Habilite para realizar pruebas', 'woo-epayco-gateway' ),
                 'default' => 'no',
 			),
@@ -298,14 +298,14 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                 'type'        => 'select',
                 'css' =>'line-height: inherit',
                 'description' => __( 'Url de la tienda donde se redirecciona al usuario luego de pagar el pedido', 'woo-epayco-gateway' ),
-                'options'       => $this->get_pages(__('Seleccionar pagina', 'epayco-woocommerce')),
+                'options'       => $this->get_pages(__('Seleccionar pagina', 'woo-epayco-gateway')),
             ),
 			'epayco_url_confirmation'          => array(
 				'title'       => __( 'Página de Confirmación', 'woo-epayco-gateway' ),
 				'type'        => 'select',
                 'css' =>'line-height: inherit',
 				'description' => __( 'Url de la tienda donde ePayco confirma el pago', 'woo-epayco-gateway' ),
-                'options'       => $this->get_pages(__('Seleccionar pagina', 'epayco-woocommerce')),
+                'options'       => $this->get_pages(__('Seleccionar pagina', 'woo-epayco-gateway')),
 			),
 			'epayco_reduce_stock_pending'    => array(
 				'title'       => __( 'Reducir el stock en transacciones pendientes', 'woo-epayco-gateway' ),
@@ -325,7 +325,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
             'response_data'     => array(
 				'title'       => __( 'Habilitar envió de atributos a través de la URL de respuesta', 'woo-epayco-gateway' ),
                 'type' => 'checkbox',
-                'label' => __('Habilitar el modo redirección con data', 'epayco_woocommerce'),
+                'label' => __('Habilitar el modo redirección con data', 'woo-epayco-gateway'),
 				'description' => __( 'Al habilitar esta opción puede exponer información sensible de sus clientes, el uso de esta opción es bajo su responsabilidad, conozca esta información en el siguiente  <a href="https://docs.epayco.co/payments/checkout#scroll-response-p" target="_blank">link.</a>', 'woo-epayco-gateway' ),
                 'default'     => 'no',
 			),
@@ -425,7 +425,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 
         echo sprintf('
                     <script
-                       src="https://checkout.epayco.co/checkout.js">
+                       src="https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod.js">
                     </script>
                     <script> var handler = ePayco.checkout.configure({
                         key: "%s",
@@ -451,14 +451,13 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                         email_billing: "%s",
                         mobilephone_billing: "%s",
                         autoclick: "true",
-                        //ip: "%s",
-                        //test: "%s".toString()
+                        ip: "%s",
+                        test: "%s".toString()
                     }
                     const apiKey = "%s";
                     const privateKey = "%s";
-                    var openChekout = function () {
-                        handler.open(data)
-                        /*if(localStorage.getItem("invoicePayment") == null){
+                    var openNewChekout = function () {
+                        if(localStorage.getItem("invoicePayment") == null){
                             localStorage.setItem("invoicePayment", data.invoice);
                             makePayment(privateKey,apiKey,data, data.external == "true"?true:false)
                         }else{
@@ -469,14 +468,14 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                             }else{
                                 makePayment(privateKey,apiKey,data, data.external == "true"?true:false)
                             }
-                        }*/
+                        }
                     }
                     var makePayment = function (privatekey, apikey, info, external) {
                         const headers = { "Content-Type": "application/json" } ;
                         headers["privatekey"] = privatekey;
                         headers["apikey"] = apikey;
                         var payment =   function (){
-                            return  fetch("https://cms.epayco.co/checkout/payment/session", {
+                            return  fetch("https://apify.epayco.io/checkout/payment/session", {
                                 method: "POST",
                                 body: JSON.stringify(info),
                                 headers
@@ -500,9 +499,13 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                                 error.message;
                             });
                     }
+                    var openChekout = function () {
+                        //handler.open(data);
+                        openNewChekout()
+                    }
                     var bntPagar = document.getElementById("btn_epayco");
                     bntPagar.addEventListener("click", openChekout);
-                    openChekout()
+            	    openChekout()
                 </script>
                 </form>
                 </center>
@@ -530,11 +533,10 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
             trim($this->epayco_publickey),
             trim($this->epayco_privatekey)
         );
-        wp_enqueue_script('epayco',  'https://checkout.epayco.co/checkout.js', array(), $this->version, null);
+        wp_enqueue_script('epayco',  'https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod.js', array(), $this->version, null);
 		wc_enqueue_js('
-        
 		jQuery("#btn_epayco_new").click(function(){
-		  openChekout()
+            console.log("epayco")
 		});
 		'
 		);
@@ -565,11 +567,11 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                     <div class="loading"></div>
                 </div>
                 <p style="text-align: center;" class="epayco-title">
-                    <span class="animated-points">' . esc_html__( 'Loading payment methods', 'woo-epayco-gateway' ) . '</span>
-                    <br><small class="epayco-subtitle"> ' . esc_html__( 'If they do not load automatically, click on the "Pay with ePayco" button', 'woo-epayco-gateway' ) . '</small>
+                    <span class="animated-points">' . esc_html__( 'Cargando métodos de pago', 'woo-epayco-gateway' ) . '</span>
+                    <br><small class="epayco-subtitle"> ' . esc_html__( 'Si no se cargan automáticamente, haga clic en el botón "Pagar con ePayco"', 'woo-epayco-gateway' ) . '</small>
                 </p>';
 
-        if ($this->epayco_lang !== "es") {
+        if ($this->epayco_lang === "2") {
             $epaycoButtonImage = 'https://multimedia.epayco.co/epayco-landing/btns/Boton-epayco-color-Ingles.png';
         }else{
             $epaycoButtonImage = 'https://multimedia.epayco.co/epayco-landing/btns/Boton-epayco-color1.png';
@@ -671,7 +673,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 
             }
 
-            $url = 'https://secure.epayco.co/validation/v1/reference/'.$ref_payco;
+            $url = 'https://secure.epayco.io/validation/v1/reference/'.$ref_payco;
             $response = wp_remote_get(  $url );
             $body = wp_remote_retrieve_body( $response );
             $jsonData = @json_decode($body, true);
@@ -1177,7 +1179,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
     {
         $username = sanitize_text_field($validationData['epayco_publickey']);
         $password = sanitize_text_field($validationData['epayco_privatey']);
-        $response = wp_remote_post( 'https://apify.epayco.co/login', array(
+        $response = wp_remote_post( 'https://apify.epayco.io/login', array(
             'headers' => array(
                 'Authorization' => 'Basic ' . base64_encode( $username . ':' . $password ),
             ),
