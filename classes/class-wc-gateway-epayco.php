@@ -422,7 +422,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
             EpaycoOrder::create($order_id,1);
             $this->restore_order_stock($order->get_id(),"decrease");
         }
-
+        $order->update_status("on-hold");
+        
         echo sprintf('
                     <script
                        src="https://checkout.epayco.co/checkout.js">
