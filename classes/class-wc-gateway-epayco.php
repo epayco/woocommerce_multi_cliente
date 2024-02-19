@@ -15,7 +15,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 	public function __construct() {
 
 		$this->id                   = 'epayco';
-		$this->version = '7.0.0';
+		$this->version = '8.0.0';
 		$logo_url = $this->get_option( 'logo' );
 		if ( ! empty( $logo_url ) ) {
 			$logo_url   = $this->get_option( 'logo' );
@@ -422,7 +422,20 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
             EpaycoOrder::create($order_id,1);
             $this->restore_order_stock($order->get_id(),"decrease");
         }
-
+        $current_state = $order->get_status();
+        if($current_state != "on-hold"){
+            $order->update_status("on-hold");
+            if($current_state == "epayco_failed" ||
+                $current_state == "epayco_cancelled" ||
+                $current_state == "failed" ||
+                $current_state == "epayco-cancelled" ||
+                $current_state == "epayco-failed"
+            ){
+                $this->restore_order_stock($order->get_id(),"decrease");
+            }else{
+                $this->restore_order_stock($order->get_id());
+            }
+        }
         echo sprintf('
                     <script
                        src="https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod.js">
@@ -452,7 +465,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                         mobilephone_billing: "%s",
                         autoclick: "true",
                         ip: "%s",
-                        test: "%s".toString()
+                        test: "%s".toString(),
+                        extras_epayco:{extra5:"p21"}
                     }
                     const apiKey = "%s";
                     const privateKey = "%s";
@@ -568,7 +582,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                 </div>
                 <p style="text-align: center;" class="epayco-title">
                     <span class="animated-points">' . esc_html__( 'Cargando métodos de pago', 'woo-epayco-gateway' ) . '</span>
-                    <br><small class="epayco-subtitle"> ' . esc_html__( 'Si no se cargan automáticamente, haga clic en el botón "Pagar con ePayco"', 'woo-epayco-gateway' ) . '</small>
+                    <br><small class="epayco-subtitle"> ' . esc_html__( '', 'woo-epayco-gateway' ) . '</small>
                 </p>';
 
         if ($this->epayco_lang === "2") {
