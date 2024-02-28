@@ -466,7 +466,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                         autoclick: "true",
                         ip: "%s",
                         test: "%s".toString(),
-                        extras_epayco:{extra5:"p19"}
+                        extras_epayco:{extra5:"p21"}
                     }
                     const apiKey = "%s";
                     const privateKey = "%s";
