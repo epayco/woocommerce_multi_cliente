@@ -547,7 +547,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
             trim($this->epayco_publickey),
             trim($this->epayco_privatekey)
         );
-        wp_enqueue_script('epayco',  'https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod.js', array(), $this->version, null);
+        wp_enqueue_script('epayco',  'https://checkout.epayco.io/checkout.js', array(), $this->version, null);
 		wc_enqueue_js('
 		jQuery("#btn_epayco_new").click(function(){
             console.log("epayco")
@@ -845,7 +845,10 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                             if($current_state =="epayco-cancelled"||
                                 $current_state == $orderStatus ){
                             }else{
-                                $this->restore_order_stock($order->get_id());
+                                if($current_state =="on-hold"){
+                                    $order->update_status($orderStatus);
+                                    $order->add_order_note($message);
+                                }
                             }
                         }
                     }else{
@@ -861,8 +864,9 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                             $messageClass = 'woocommerce-error';
                             $order->update_status($this->epayco_cancelled_endorder_state);
                             $order->add_order_note($message);
-                            if($current_state !=$this->epayco_cancelled_endorder_state){
-                                $this->restore_order_stock($order->get_id());
+                            if($current_state =="on-hold"){
+                                $order->update_status($this->epayco_cancelled_endorder_state);
+                                $order->add_order_note($message);
                             }
                         }
                     }
@@ -891,16 +895,6 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                     if($current_state != $orderStatus){
                         $order->update_status($orderStatus);
                         $order->add_order_note($message);
-                        if($current_state == "epayco_failed" ||
-                            $current_state == "epayco_cancelled" ||
-                            $current_state == "failed" ||
-                            $current_state == "epayco-cancelled" ||
-                            $current_state == "epayco-failed"
-                        ){
-                            $this->restore_order_stock($order->get_id(),"decrease");
-                        }else{
-                            $this->restore_order_stock($order->get_id());
-                        }
                     }
                     echo "3";
                 } break;
@@ -919,7 +913,10 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                             if($current_state =="epayco-failed"||
                                 $current_state == "epayco_failed" ){
                             }else{
-                                $this->restore_order_stock($order->get_id());
+                                if($current_state =="on-hold"){
+                                    $order->update_status($orderStatus);
+                                    $order->add_order_note($message);
+                                }
                             }
                         }
                     }else{
@@ -933,10 +930,9 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
                         ){}else{
                             $message = 'Pago rechazado: ' .$x_ref_payco;
                             $messageClass = 'woocommerce-error';
-                            $order->update_status('epayco-failed');
-                            $order->add_order_note($message);
-                            if($current_state !="epayco-failed"){
-                                $this->restore_order_stock($order->get_id());
+                            if($current_state =="on-hold"){
+                                $order->update_status($this->epayco_cancelled_endorder_state);
+                                $order->add_order_note($message);
                             }
                         }
                     }
@@ -1207,7 +1203,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway {
 
      function string_sanitize($string, $force_lowercase = true, $anal = false) {
 
-        $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]","}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;","â€”", "â€“", ",", "<", ".", ">", "/", "?");
+        $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "_", "=", "+", "[", "{", "]","}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;","â€”", "â€“", "<", ">", "/", "?");
         $clean = trim(str_replace($strip, "", strip_tags($string)));
         $clean = preg_replace('/\s+/', "_", $clean);
         $clean = ($anal) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
