@@ -1,10 +1,10 @@
 === ePayco plugin for WooCommerce ===
 Contributors: ePayco Team
 Donate link: https://epayco.com/
-Tags: e-commerce, commerce, wordpress ecommerce, store, sales, sell, shop, shopping, cart, checkout, configurable, epayco
-Requires at least: 5.5
+Tags:  multisitio, checkout, epayco, payment, woocommerce
+Requires at least: WordPress 5.5
 Tested up to: 6.4
-Stable tag: 7.0.0
+Stable tag: 8.0.0
 Requires PHP: 5.6.0
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -12,7 +12,6 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Receive payments, accept credit cards, deposits and transfers.
 
 == Description ==
-
 
 ePayco helps you grow your business with rates tailored to your needs.
 Receive payments, accept credit cards, deposits and transfers.
@@ -45,8 +44,8 @@ Yes. But it is advisable that you consider using it since it is revealing for br
 
 == Changelog ==
 
-= 6.0.0 =
+= 8.0.0 =
 * Initial stable release
 
 == Additional Info ==
-**Contribute** [repository on github](https://github.com/epayco/Plugin_ePayco_WooCommerce)
+**Contribute** [repository on github](https://github.com/epayco/woocommerce_multi_cliente)
