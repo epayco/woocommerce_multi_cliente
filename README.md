@@ -9,7 +9,7 @@
 * [ePayco plugin WooCommerce v7.0.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v7.0.0).
 * [ePayco plugin WooCommerce v7.1.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v7.1.0).
 * [ePayco plugin WooCommerce v8.0.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v8.0.0).
-* 
+
 ## Tabla de contenido
 
 * [Versiones](#versiones)
