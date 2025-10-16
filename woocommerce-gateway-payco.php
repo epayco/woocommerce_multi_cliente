@@ -1,10 +1,10 @@
 <?php
 /**
- * WooCommerce Epayco Gateway
+ * WooCommerce Epayco Multi Store
  *
- * @package WooCommerce Epayco Gateway
+ * @package WooCommerce Epayco Multi Store
  *
- * Plugin Name: WooCommerce Epayco Gateway
+ * Plugin Name: WooCommerce Epayco Multi Store
  * Description: Plugin ePayco Gateway for WooCommerce.
  * Version: 8.1.0
  * Author: ePayco
