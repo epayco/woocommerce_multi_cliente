@@ -27,7 +27,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
         $this->id = 'epayco';
         //$this->version = '8.2.2';
         $this->icon = apply_filters('woocommerce_' . $this->id . '_icon', EPAYCO_PLUGIN_URL . 'assets/images/paymentLogo.svg' );
-        $this->method_title         = __('ePayco Checkout Gateway', 'woo-epayco-gateway');
+        $this->method_title         = __('ePayco Checkout Multi Store', 'woo-epayco-gateway');
         $this->method_description   = __('Acepta tarjetas de credito, depositos y transferencias.', 'woo-epayco-gateway');
         //$this->order_button_text = __('Pay', 'epayco_woocommerce');
         $this->has_fields           = false;
