@@ -1,6 +1,6 @@
 #ePayco plugin para WooCommerce multi sitio
 
-**Si usted tiene alguna pregunta o problema, no dude en ponerse en contacto con nuestro soporte técnico: desarrollo@payco.co.**
+**Si usted tiene alguna pregunta o problema, no dude en ponerse en contacto con nuestro soporte técnico: desarrollo@epayco.com.**
 
 ## Versiones
 * [ePayco plugin WooCommerce v4.x](https://github.com/epayco/woocommerce_multi_cliente).
@@ -20,7 +20,7 @@
 
 ## Requisitos
 
-* Tener una cuenta activa en [ePayco](https://pagaycobra.com).
+* Tener una cuenta activa en [ePayco](https://epayco.com/).
 * Tener instalado WordPress y WooCommerce multi sitio.
 * Acceso a las carpetas donde se encuetra instalado WordPress y WooCommerce multi sitio.
 * Acceso al admin de WordPress.
