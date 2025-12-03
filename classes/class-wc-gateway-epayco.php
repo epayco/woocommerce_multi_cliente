@@ -27,7 +27,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
         $this->id = 'epayco';
         //$this->version = '8.2.2';
         $this->icon = apply_filters('woocommerce_' . $this->id . '_icon', EPAYCO_PLUGIN_URL . 'assets/images/paymentLogo.svg' );
-        $this->method_title         = __('ePayco Checkout Gateway', 'woo-epayco-gateway');
+        $this->method_title         = __('ePayco Checkout Multi Store', 'woo-epayco-gateway');
         $this->method_description   = __('Acepta tarjetas de credito, depositos y transferencias.', 'woo-epayco-gateway');
         //$this->order_button_text = __('Pay', 'epayco_woocommerce');
         $this->has_fields           = false;
@@ -289,7 +289,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
          * @param mixed $order_id
          * @return string
          */
-        function generate_epayco_form($order_id)
+ function generate_epayco_form($order_id)
         {
             global $woocommerce;
             $order = new WC_Order($order_id);
@@ -324,7 +324,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
             $currency = strtolower(get_woocommerce_currency());
             $testMode = $this->settings['epayco_testmode'] == "yes" ? true : false;
             $basedCountry = WC()->countries->get_base_country();
-            $external = $this->settings['epayco_type_checkout'];
+            $external = $this->settings['epayco_type_checkout']  == "true" ? 'standard' : 'onepage';
             $redirect_url = get_site_url() . "/";
             $redirect_url = add_query_arg('wc-api', get_class($this), $redirect_url);
             $redirect_url = add_query_arg('order_id', $order_id, $redirect_url);
@@ -360,7 +360,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
             $payload  = array(
                 "name"=>$descripcion,
                 "description"=>$descripcion,
-                "invoice"=>(string)$order->get_id().date("H:i:s"),
+                "invoice"=>(string)$order->get_id(),
                 "currency"=>$currency,
                 "amount"=>floatval($order->get_total()),
                 "taxBase"=>floatval($base_tax),
@@ -383,7 +383,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     "extra1" => (string)$order->get_id(),
                 ],
                 "extrasEpayco" => [
-                    "extra5" => "p21"
+                    "extra5" => "P21"
                 ],
                 "epaycoMethodsDisable" => [],
                 "method"=> "POST",
@@ -439,25 +439,25 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
             }
             $checkout =  base64_encode(json_encode([
                 "sessionId"=>$payload['sessionId'],
-                "external"=>$external
+                "external"=>$external,
+                "test"=>$testMode
             ]));            
             echo sprintf(
-                '<script
-                    src="https://epayco-checkout-testing.s3.us-east-1.amazonaws.com/checkout.preprod.js">
-                </script>
-                <script>
+                '<script>
                     const params = JSON.parse(atob("%s"));
                     let {
                         sessionId,
-                        external
-                    } = params;
+                        external,
+                        test
+                    } = params; 
+                    const checkout = ePayco.checkout.configure({
+                        sessionId: sessionId,
+                        type: external,
+                        test: test
+                    });
                     var bntPagar = document.getElementById("btn_epayco");
                     var openNewChekout = function () {
-                        const handlerNew = ePayco.checkout.configure({
-                            sessionId: sessionId,
-                            external: external,
-                        });
-                        handlerNew.openNew();
+                        checkout.open();
                     }      
                     var openChekout = function () {
                         //bntPagar.style.pointerEvents = "none";
@@ -474,6 +474,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
         ',
             $checkout
         );
+        wp_enqueue_script('epayco',  'https://epayco-checkout-testing.s3.amazonaws.com/checkout.preprod-v2.js', array(), '8.3.0', null);
         return '<form  method="post" id="appGateway">
 		        </form>';
         }
