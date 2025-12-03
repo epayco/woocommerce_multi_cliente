@@ -387,7 +387,10 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 ],
                 "epaycoMethodsDisable" => [],
                 "method"=> "POST",
-                "checkout_version"=>"2"
+                "checkout_version"=>"2",
+                "noRedirectOnClose"=> true,
+                "forceResponse"=>false,//mostrar detalle de orden
+                "uniqueTransactionPerBill"=> false,
             );
             $path = "payment/session/create";
             $newToken['token'] =  $bearerToken;
