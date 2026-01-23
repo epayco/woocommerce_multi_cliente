@@ -6,11 +6,11 @@
  *
  * Plugin Name: WooCommerce Epayco Multi Store
  * Description: Plugin ePayco Gateway for WooCommerce.
- * Version: 8.1.0
+ * Version: 8.2.0
  * Author: ePayco
  * Author URI: http://epayco.co
  * Tested up to: 6.8.3
- * WC requires at least: 8.1.0
+ * WC requires at least: 8.2.0
  * WC tested up to: 10.2.1
  * Text Domain: woo-epayco-gateway
  * Domain Path: /i18n/languages/
