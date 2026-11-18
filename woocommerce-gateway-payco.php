@@ -13,7 +13,7 @@
  * WC requires at least: 8.2.0
  * WC tested up to: 10.2.1
  * Text Domain: woo-epayco-gateway
- * Domain Path: /i18n/languages/
+ * Domain Path: /languages/ 
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -115,7 +115,11 @@ function woocommerce_gateway_epayco_block_support() {
 add_action( 'woocommerce_blocks_loaded', 'woocommerce_gateway_epayco_block_support' );
 
 function epayco_woocommerce_addon_settings_link( $links ) {
-    array_push( $links, '<a href="admin.php?page=wc-settings&tab=checkout&section=epayco">' . __( 'Configuración' ) . '</a>' );
+    $locale = determine_locale();
+    $label = (strpos($locale, 'es') === 0) ? 'Configuración' : 'Settings';
+    $settings_url = admin_url('admin.php?page=wc-settings&tab=checkout&section=epayco');
+    array_push($links, '<a href="' . esc_url($settings_url) . '">' . esc_html($label) . '</a>');
+
     return $links;
 }
 
