@@ -26,8 +26,9 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
 
         $this->id = 'epayco';
         //$this->version = '8.2.2';
-        $this->icon = apply_filters('woocommerce_' . $this->id . '_icon', EPAYCO_PLUGIN_URL . 'assets/images/paymentLogo.svg' );
-        $this->method_title         = __('ePayco Checkout Multi Store', 'woo-epayco-gateway');
+        $payment_logo = DAVIPAY_ROUTE_IMAGES_S3 . 'checkout/payment-methods/logo-checkout-payment-methods.svg';
+        $this->icon = apply_filters('woocommerce_' . $this->id . '_icon', $payment_logo );
+        $this->method_title         = __('Davipay Checkout Multi Store', 'woo-epayco-gateway');
         $this->method_description   = __('Acepta tarjetas de credito, depositos y transferencias.', 'woo-epayco-gateway');
         //$this->order_button_text = __('Pay', 'epayco_woocommerce');
         $this->has_fields           = false;
@@ -153,24 +154,24 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
 
         <div class="container-fluid">
             <div class="panel panel-default" style="">
-                <img src="<?php echo EPAYCO_PLUGIN_URL . '/assets/images/logoepayco.svg' ?>" >
+                <img src="<?php echo esc_url( DAVIPAY_ROUTE_IMAGES_S3 . 'Imagotipo/checkoutSmallWhite_01_v1.svg' ); ?>">
                 <div id="path_upload" hidden>
                     <?php esc_html_e($logo_url, 'text_domain'); ?>
                 </div>
                 <div id="path_images" hidden>
-                    <?php echo EPAYCO_PLUGIN_URL . 'assets/images' ?>
+                    <?php echo esc_url( DAVIPAY_ROUTE_IMAGES_S3 ); ?>
                 </div>
                 <div id="path_validate" hidden>
                     <?php esc_html_e($validation_url, 'text_domain'); ?>
                 </div>
                 <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-pencil"></i><?php esc_html_e('Configuración Epayco', 'woo-epayco-gateway'); ?></h3>
-                </div>ePayco
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i><?php esc_html_e('Configuración Davipay', 'woo-epayco-gateway'); ?></h3>
+                </div>
             </div>
             <div style="color: #31708f; background-color: #d9edf7; border-color: #bce8f1;padding: 10px;border-radius: 5px;">
-                <?php esc_html_e('Este módulo le permite aceptar pagos seguros por la plataforma de pagos ePayco.Si el cliente decide pagar por ePayco, el estado del pedido cambiará a ', 'woo-epayco-gateway'); ?><b>
+                <?php esc_html_e('Este módulo le permite aceptar pagos seguros por la plataforma de pagos Davipay. Si el cliente decide pagar por Davipay, el estado del pedido cambiará a ', 'woo-epayco-gateway'); ?><b>
                     <?php esc_html_e(' Esperando Pago', 'woo-epayco-gateway'); ?></b>.
-                <br><?php esc_html_e('Cuando el pago sea Aceptado o Rechazado ePayco envía una confirmación a la tienda para cambiar el estado del pedido.', 'woo-epayco-gateway'); ?>
+                <br><?php esc_html_e('Cuando el pago sea Aceptado o Rechazado, Davipay envía una confirmación a la tienda para cambiar el estado del pedido.', 'woo-epayco-gateway'); ?>
             </div>
 
             <?php if ($this->is_valid_for_use()) : ?>
@@ -200,10 +201,10 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                 <div class="modal-content">
                                     <span class="close">&times;</span>
                                     <center>
-                                        <img src="<?php echo EPAYCO_PLUGIN_URL . '/assets/images/logo_warning.png' ?>">
+                                        <img src="<?php echo esc_url( DAVIPAY_ROUTE_IMAGES_S3 . 'admin/credentials/logos/warning/logo-credentials-warning.png' ); ?>">
                                     </center>
                                     <p><strong><?php esc_html_e('Llaves de comercio inválidas', 'woo-epayco-gateway'); ?></strong> </p>
-                                    <p><?php esc_html_e('Las llaves Public Key, Private Key insertadas', 'woo-epayco-gateway'); ?><br><?php esc_html_e('del comercio son inválidas.', 'woo-epayco-gateway'); ?><br><?php esc_html_e('Consúltelas en el apartado de integraciones', 'woo-epayco-gateway'); ?> <br><?php esc_html_e('Llaves API en su Dashboard ePayco.', 'woo-epayco-gateway'); ?>,</p>
+                                    <p><?php esc_html_e('Las llaves Public Key, Private Key insertadas', 'woo-epayco-gateway'); ?><br><?php esc_html_e('del comercio son inválidas.', 'woo-epayco-gateway'); ?><br><?php esc_html_e('Consúltelas en el apartado de integraciones', 'woo-epayco-gateway'); ?> <br><?php esc_html_e('Llaves API en su Dashboard Davipay.', 'woo-epayco-gateway'); ?>,</p>
                                 </div>
                             </div>
 
@@ -233,7 +234,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         ?>
                 </strong>:
                 <?php
-                esc_html_e('Servired/Epayco only support ', 'woo-epayco-gateway');
+                esc_html_e('Servired/Davipay only support ', 'woo-epayco-gateway');
                 echo esc_html($formated_currencies);
                 ?>
             </p>
@@ -427,13 +428,14 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                         flex-direction: column;
                     ">
                     <div>
-                    <img style="width: 80px;" src="https://multimedia.epayco.co/plugins-sdks/warning.png" alt="" />
+                    <img style="width: 80px;" src="%s" alt="" />
                     </div>
                     <div 
                     style="text-align: center;font-size: large;font-weight: 900;">
                         <p>"%s"</p>
                     </div>
                 </div>',
+                    esc_url( DAVIPAY_ROUTE_IMAGES_S3 . 'admin/credentials/logos/warning/logo-credentials-warning.png' ),
                     $processReturnFailMessage
                 );
             }
@@ -538,13 +540,13 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 </div>
                 <p style="text-align: center;" class="epayco-title">
                     <span class="animated-points">' . esc_html__('Cargando métodos de pago', 'woo-epayco-gateway') . '</span>
-                    <br><small class="epayco-subtitle"> ' . esc_html__('', 'woo-epayco-gateway') . '</small>
+                    <br><small class="epayco-subtitle"> ' . esc_html__('Si no se cargan automáticamente, haga clic en el botón. Pagar con Davipay', 'woo-epayco-gateway') . '</small>
                 </p>';
 
             if ($this->settings['epayco_lang'] === "2") {
-                $epaycoButtonImage = 'https://multimedia.epayco.co/epayco-landing/btns/Boton-epayco-color-Ingles.png';
+                $epaycoButtonImage = DAVIPAY_ROUTE_IMAGES_S3 . 'checkout/checkout-button/logo-checkout-payment-button-ing.png';
             } else {
-                $epaycoButtonImage = 'https://multimedia.epayco.co/epayco-landing/btns/Boton-epayco-color1.png';
+                $epaycoButtonImage = DAVIPAY_ROUTE_IMAGES_S3 . 'checkout/checkout-button/logo-checkout-payment-button-es.png';
             }
             echo '<p>       
                  <center>
@@ -569,7 +571,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 header('HTTP/1.1 200 OK');
                 do_action('valid-' . $this->id . '-standard-ipn-request', $post);
             } else {
-                wp_die('Do not access this page directly (ePayco)');
+                wp_die('Do not access this page directly (Davipay)');
             }
         }
 
@@ -580,7 +582,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 header('HTTP/1.1 200 OK');
                 do_action("ePayco_init_validation", $_REQUEST);
             } else {
-                wp_die('Do not access this page directly (ePayco)');
+                wp_die('Do not access this page directly (Davipay)');
             }
         }
 
