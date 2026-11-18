@@ -127,7 +127,7 @@ return apply_filters(
             'title'       => __('Habilitar envió de atributos a través de la URL de respuesta', 'woo-epayco-gateway'),
             'type' => 'checkbox',
             'label' => __('Habilitar el modo redirección con data', 'woo-epayco-gateway'),
-            'description' => __('Al habilitar esta opción puede exponer información sensible de sus clientes, el uso de esta opción es bajo su responsabilidad, conozca esta información en el siguiente  <a href="https://docs.davipay.co/payments/checkout#scroll-response-p" target="_blank">link.</a>', 'woo-epayco-gateway'),
+            'description' => __('Al habilitar esta opción puede exponer información sensible de sus clientes, el uso de esta opción es bajo su responsabilidad, conozca esta información en el siguiente  <a href="https://docs.davipay.com/docs/checkout-respuesta-y-confirmacion#página-de-respuesta-response" target="_blank">link.</a>', 'woo-epayco-gateway'),
             'default'     => 'no',
         ),
         'cron_data'     => array(
