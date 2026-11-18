@@ -14,7 +14,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
      * Settings
      */
     public static $_settings = array();
-    public const PAYMENTS_IDS = 'epayco_meta_data';
+    public const PAYMENTS_IDS = 'davipay_meta_data';
+    public const PAYMENTS_IDS_LEGACY = 'epayco_meta_data';
     /**
      * Constructor for the gateway.
      *
@@ -490,7 +491,12 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
          */
         public function getPaymentsIdMeta(WC_Order $order, bool $single = true)
         {
-            return $order->get_meta(self::PAYMENTS_IDS, $single);
+            $payment_ids = $order->get_meta(self::PAYMENTS_IDS, $single);
+            if ($payment_ids === '' || $payment_ids === null || $payment_ids === array()) {
+                return $order->get_meta(self::PAYMENTS_IDS_LEGACY, $single);
+            }
+
+            return $payment_ids;
         }
 
         /**
@@ -504,7 +510,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
             try {
                 $logger = new WC_Logger();
                 if ( $order instanceof WC_Order ) {
-                    $order->add_meta_data( self::PAYMENTS_IDS, $value );
+                    $order->update_meta_data( self::PAYMENTS_IDS, $value );
                     $order->save();
                 }
             } catch (\Exception $ex) {
@@ -960,7 +966,15 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     'limit'    => -1,
                     'status'   => 'on-hold',
                     'meta_query' => array(
-                        'key' => self::PAYMENTS_IDS
+                        'relation' => 'OR',
+                        array(
+                            'key'     => self::PAYMENTS_IDS,
+                            'compare' => 'EXISTS',
+                        ),
+                        array(
+                            'key'     => self::PAYMENTS_IDS_LEGACY,
+                            'compare' => 'EXISTS',
+                        ),
                     )
                 ));
                 $ref_payco_list = [];
@@ -1135,12 +1149,12 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
 
         public function syncOrderStatus(\WC_Order $order): string
         {
-            $paymentsIds   = explode(',', $order->get_meta(self::PAYMENTS_IDS));
+            $paymentsIds   = explode(',', $this->getPaymentsIdMeta($order));
             $lastPaymentId = trim(end($paymentsIds));
             if ($lastPaymentId) {
                 return $lastPaymentId;
             } else {
-                return false;
+                return '';
             }
         }
 

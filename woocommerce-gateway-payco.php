@@ -409,7 +409,13 @@ function my_custom_checkout_field_update_order_meta( $order_id ) {
 add_action( 'woocommerce_admin_order_data_after_payment_info', 'my_custom_checkout_field_display_admin_order_meta', 10, 1 );
 function my_custom_checkout_field_display_admin_order_meta( $order ){
      $order_id = method_exists( $order, 'get_id' ) ? $order->get_id() : $order->id;
-     $ref_payco = $order->get_meta('refPayco')??get_post_meta( $order_id, 'refPayco', true );
+     $ref_payco = $order->get_meta('refDavipay');
+     if ($ref_payco === '' || $ref_payco === null) {
+         $ref_payco = $order->get_meta('refPayco');
+     }
+     if ($ref_payco === '' || $ref_payco === null) {
+         $ref_payco = get_post_meta( $order_id, 'refPayco', true );
+     }
      $modo = $order->get_meta('modo')??get_post_meta( $order_id, 'modo', true );
      $fecha = $order->get_meta('fecha')??get_post_meta( $order_id, 'fecha', true );
      $franquicia = $order->get_meta('franquicia')??get_post_meta( $order_id, 'franquicia', true );
@@ -469,7 +475,11 @@ function payco_shop_order($postOrOrderObject) {
     $order = ($postOrOrderObject instanceof WP_Post) ? wc_get_order($postOrOrderObject->ID) : $postOrOrderObject;
     try {
         $logger = new WC_Logger();
-        $paymentsIds   = explode(',', $order->get_meta(WC_Gateway_Epayco::PAYMENTS_IDS, true));
+        $paymentsIdsMetadata = $order->get_meta(WC_Gateway_Epayco::PAYMENTS_IDS, true);
+        if ($paymentsIdsMetadata === '' || $paymentsIdsMetadata === null || $paymentsIdsMetadata === array()) {
+            $paymentsIdsMetadata = $order->get_meta(WC_Gateway_Epayco::PAYMENTS_IDS_LEGACY, true);
+        }
+        $paymentsIds = explode(',', $paymentsIdsMetadata);
         $lastPaymentId = trim(end($paymentsIds));
         $orderStatus = $order->get_status();
         $logger->add('ePayco_shop_order', $lastPaymentId);

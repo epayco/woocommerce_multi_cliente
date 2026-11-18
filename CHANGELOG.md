@@ -10,6 +10,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ### Changed
 
 - Cambio visual de marca a Davipay; se mantienen intactos los flujos de pago.
+- Compatibilidad de lectura para metadatos de órdenes existentes de ePayco (`refPayco` y `epayco_meta_data`).
 
 ## [Unreleased]
 

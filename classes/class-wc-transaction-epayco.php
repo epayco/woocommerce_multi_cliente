@@ -43,12 +43,21 @@ class Epayco_Transaction_Handler {
     }
 
     private static function save_epayco_metadata($order, $modo, $data) {
-        $order->update_meta_data('refPayco', esc_attr($data['x_ref_payco']));
+        $order->update_meta_data('refDavipay', esc_attr($data['x_ref_payco']));
         $order->update_meta_data('modo', esc_attr($modo));
         $order->update_meta_data('fecha', esc_attr($data['x_fecha_transaccion']));
         $order->update_meta_data('franquicia', esc_attr($data['x_franchise']));
         $order->update_meta_data('autorizacion', esc_attr($data['x_approval_code']));
         $order->save();
+    }
+
+    public static function get_payment_reference($order) {
+        $reference = $order->get_meta('refDavipay');
+        if ($reference === '' || $reference === null) {
+            $reference = $order->get_meta('refPayco');
+        }
+
+        return $reference;
     }
 
     private static function get_success_status($settings) {
@@ -97,7 +106,7 @@ class Epayco_Transaction_Handler {
 
             if (!in_array($current_state, ['processing', 'completed', 'processing_test', 'completed_test','epayco-processing', 'epayco-completed','epayco_processing', 'epayco_completed',])) {
 
-                $order->payment_complete($order->get_meta('refPayco'));
+                $order->payment_complete(self::get_payment_reference($order));
                 $order->update_status($estado_final_exitoso);
                 if ($settings['reduce_stock_pending'] !== "yes"){
                     self::restore_stock($order_id, 'decrease');
