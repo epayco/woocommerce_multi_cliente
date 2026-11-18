@@ -150,6 +150,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
         $validation_url = add_query_arg('wc-api', get_class($this) . "Validation", $validation_url);
         $logo_url = get_site_url() . "/";
         $logo_url = add_query_arg('wc-api', get_class($this) . "ChangeLogo", $logo_url);
+          $locale = determine_locale();
+        $validate_label = (strpos($locale, 'es') === 0) ? 'Validar' : 'Validate';
 ?>
 
 
@@ -190,7 +192,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                             <form method="post" action="#">
                                 <label for="woocommerce_epayco_enabled">
                                 </label>
-                                <input type="button" class="button-primary woocommerce-save-button validar" value="Validar">
+                                <input type="button" id="validar" class="button-primary woocommerce-save-button validar" value="<?php echo esc_attr($validate_label); ?>">
                                 <p class="description">
                                     <?php esc_html_e('Validación de llaves PUBLIC_KEY y PRIVATE_KEY', 'woo-epayco-gateway'); ?>
                                 </p>
