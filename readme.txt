@@ -41,7 +41,7 @@ Davipay accepts Visa, MasterCard, American Express, Diners Club, SEPA, PSE (Bank
 == Frequently Asked Questions ==
 
 = I had a question during setup, where can I check the documentation? =
-In our developer website you will find the step by step guide on [how to integrate the Davipay Plugin](https://github.com/epayco/Plugin_ePayco_WooCommerce?tab=readme-ov-file#requisitos) in your online store.
+In our developer website you will find the step by step guide on [how to integrate the Davipay Plugin](https://github.com/epayco/woocommerce_multi_cliente/?tab=readme-ov-file#requisitos) in your online store.
 
 = I reviewed the documentation and these FAQs but still have problems in my store, what can I do? =
 If you have already reviewed the documentation and have not found a solution, you can contact our support team through their [contact form](https://davipay.com/contacto/). Please note that we guarantee a response as soon as possible.
@@ -54,29 +54,29 @@ Yes. It is advisable to use an SSL certificate as it is crucial for browser secu
 
 = Automatic Installation =
 
-Automatic installation is super easy because WordPress takes care of the file transfers for you, so you donâ€™t even need to leave your web browser. To automatically install the Davipay plugin for Woocommerce Stripe plugin, just log in to your WordPress dashboard, go to the Plugins menu, and click Add New.
+Automatic installation is super easy because WordPress takes care of the file transfers for you, so you don’t even need to leave your web browser. To automatically install the Davipay plugin for WooCommerce, just log in to your WordPress dashboard, go to the Plugins menu, and click Add New.
 
-In the search field, type â€œDavipay plugin for Woocommerceâ€ and hit Search Plugins. Once you find our plugin, you can check out details like the version, rating, and description. The best part? You can install it with a simple click on â€œInstall Nowâ€ and then â€œActivateâ€.
+In the search field, type “Davipay plugin for WooCommerce” and hit Search Plugins. Once you find our plugin, you can check out details like the version, rating, and description. The best part? You can install it with a simple click on “Install Now” and then “Activate”.
 
 = Manual Installation =
 
-1. Download the [zip](https://github.com/epayco/Plugin_ePayco_WooCommerce?tab=readme-ov-file#requisitos) or from the [WordPress Module Directory](https://wordpress.org/plugins/epayco-gateway/).
-2. Go to the â€œPluginsâ€ module and click on â€œUpload Pluginâ€.
+1. Download the [zip](https://github.com/epayco/woocommerce_multi_cliente/?tab=readme-ov-file#requisitos) or from the [WordPress Module Directory](https://wordpress.org/plugins/epayco-gateway/).
+2. Go to the “Plugins” module and click on “Upload Plugin”.
 3. Upload the file, install, and activate the plugin.
 
 Done! 
 
-= Installing this plugin wonâ€™t slow down your store at all! =
+= Installing this plugin won’t slow down your store at all! =
 
-If everything went smoothly, youâ€™ll find it in your list of â€œInstalled Pluginsâ€ in the WordPress dashboard. Just enable it and then move on to integrating and setting up your Davipay account.
+If everything went smoothly, you’ll find it in your list of “Installed Plugins” in the WordPress dashboard. Just enable it and then move on to integrating and setting up your Davipay account.
 
 = Davipay Integration =
 
 Log in to the Davipay dashboard with your credentials.
 
-Next, go to the settings module, click on configuration-customizations, and finally, select the â€œSecret Keysâ€ category. 
+Next, go to the settings module, click on configuration-customizations, and finally, select the “Secret Keys” category. 
 
-Approve your account to go toâ€¯production and receive real payments. 
+Approve your account to go to production and receive real payments. 
 
 = Configuration=
 
@@ -106,4 +106,4 @@ Approve your account to go toâ€¯production and receive real payments.
 * Rebranding to Davipay
 
 == Additional Info ==
-Contribute to the repository on GitHub: [Visit the GitHub repository](https://github.com/epayco/Plugin_ePayco_WooCommerce)
+Contribute to the repository on GitHub: [Visit the GitHub repository](https://github.com/epayco/woocommerce_multi_cliente/)

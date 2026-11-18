@@ -1,4 +1,4 @@
-#Davipay plugin para WooCommerce multi sitio
+# Davipay plugin for WooCommerce Multi Sitio
 
 **Si usted tiene alguna pregunta o problema, no dude en ponerse en contacto con nuestro soporte técnico: desarrollo@davipay.com.**
 

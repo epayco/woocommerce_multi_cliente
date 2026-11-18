@@ -58,7 +58,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
         add_action('woocommerce_checkout_create_order' . $this->id, array($this, 'add_expiration'));
 
         //Cron
-        add_action('woocommerce_epayco_cleanup_draft_orders', [$this, 'delete_epayco_expired_draft_orders']);
+        add_action('woocommerce_davipay_cleanup_draft_orders', [$this, 'delete_epayco_expired_draft_orders']);
         add_action('woocommerc_epayco_cron_hook', [$this, 'woocommerc_epayco_cron_job_funcion']);
 
         add_action('admin_init', [$this, 'install']);
@@ -97,8 +97,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
     {
         $cron_data = $this->settings['cron_data'] == "yes" ? true : false;
         if ($cron_data) {
-            if (function_exists('as_next_scheduled_action') && false === as_next_scheduled_action('woocommerce_epayco_cleanup_draft_orders')) {
-                as_schedule_recurring_action(time() + 3600, 3600, 'woocommerce_epayco_cleanup_draft_orders');
+            if (function_exists('as_next_scheduled_action') && false === as_next_scheduled_action('woocommerce_davipay_cleanup_draft_orders')) {
+                as_schedule_recurring_action(time() + 3600, 3600, 'woocommerce_davipay_cleanup_draft_orders');
             }
         }
     }
@@ -746,7 +746,7 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                                 $messageClass = 'error';
                             }
                         }
-                        echo $x_cod_transaction_state . " firma no valida: " . $validation;
+                        echo $x_cod_transaction_state . " invalid signature: " . $validation;
                     }
                 }
 
@@ -1190,10 +1190,11 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
             ]);
 
             if (is_wp_error($response)) {
-                $error_message = $response->get_error_message();
-                self::$logger->add($this->id, "Error al hacer la llamada a la API de ePayco: " . $error_message);
-                error_log("Error al hacer la llamada a la API de ePayco: " . $error_message);
+                     $error_message = $response->get_error_message();
+                self::$logger->add($this->id, "Error calling the Davipay API: " . $error_message);
+                error_log("Error calling the Davipay API: " . $error_message);
                 return false;
+
             } else {
                 $response_body = wp_remote_retrieve_body($response);
                 $status_code = wp_remote_retrieve_response_code($response);
@@ -1201,8 +1202,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     $responseTransaction = json_decode($response_body, true);
                     return $responseTransaction;
                 } else {
-                    self::$logger->add($this->id,"Error en la respuesta de la API de ePayco, código de estado: " . $status_code);
-                    error_log("Error en la respuesta de la API de ePayco, código de estado: " . $status_code);
+                   self::$logger->add($this->id, "Error in the Davipay API response, status code: " . $status_code);
+                    error_log("Error in the Davipay API response, status code: " . $status_code);
                     return false;
                 }
             }

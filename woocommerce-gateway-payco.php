@@ -8,7 +8,7 @@
  * Description: Plugin Davipay Gateway for WooCommerce.
  * Version: 9.0.0
  * Author: Davipay
- * Author URI: http://davipay.co
+ * Author URI: https://www.davipay.com/
  * Tested up to: 6.8.3
  * WC requires at least: 8.2.0
  * WC tested up to: 10.2.1
@@ -35,7 +35,7 @@ if ( ! defined( 'DAVIPAY_ROUTE_IMAGES_S3' ) ) {
 	define( 'DAVIPAY_ROUTE_IMAGES_S3', 'http://multimedia.epayco.io/plugins-sdks/' );
 }
 if ( ! defined( 'CMS_ROUTE_IMAGES_S3' ) ) {
-	define( 'CMS_ROUTE_IMAGES_S3', 'https://cms.epayco.co/imagenes/' );
+	define( 'CMS_ROUTE_IMAGES_S3', 'https://eks-cms-backend-platforms-service.epayco.io/imagenes/' );
 }
 
 add_action( 'plugins_loaded', 'woocommerce_gateway_epayco_init', 11 );
@@ -463,10 +463,10 @@ function add_custom_hiden_order_item_meta_data( $item, $cart_item_key, $values, 
 
 function epayco_cron_job_deactivation() {
     wp_clear_scheduled_hook('woocommerc_epayco_cron_hook');
-    as_unschedule_action( 'woocommerce_epayco_cleanup_draft_orders' );
-    $timestamp = wp_next_scheduled('woocommerce_epayco_cleanup_draft_orders');
+    as_unschedule_action( 'woocommerce_davipay_cleanup_draft_orders' );
+    $timestamp = wp_next_scheduled('woocommerce_davipay_cleanup_draft_orders');
     if ($timestamp) {
-        wp_unschedule_event($timestamp, 'woocommerce_epayco_cleanup_draft_orders');
+        wp_unschedule_event($timestamp, 'woocommerce_davipay_cleanup_draft_orders');
     }
 }
 register_deactivation_hook(__FILE__, 'epayco_cron_job_deactivation');
@@ -511,7 +511,7 @@ add_action('add_meta_boxes_shop_order', 'payco_shop_order');
 add_action('add_meta_boxes_woocommerce_page_wc-orders', 'payco_shop_order');
 
 
-add_action('woocommerc_epayco_order_hook', 'woocommerce_epayco_cleanup_draft_orders');
+add_action('woocommerc_epayco_order_hook', 'woocommerce_davipay_cleanup_draft_orders');
 
 register_deactivation_hook(__FILE__, 'epayco_cron_inactive');
 function epayco_cron_inactive() {
