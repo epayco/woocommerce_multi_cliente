@@ -1,8 +1,10 @@
 (function($) {
     $(document).ready(function() {
-       console.log("epayco admin.")
+       console.log("Davipay admin.")
         var modal = document.getElementById("myModal");
         var span = document.getElementsByClassName("close")[0];
+        var lang = (document.documentElement.lang || "es").toLowerCase();
+        var isSpanish = lang.indexOf("es") === 0;
         span.onclick = function() {
             modal.style.display = "none";
         }
@@ -25,7 +27,7 @@
                     success: function(response) {
                         debugger
                         if (response == "success") {
-                            alert("validacion exitosa!");
+                           alert(isSpanish ? "¡Validación exitosa!" : "Validation successful!")
                         } else {
                             modal.style.display = "block";
                         }

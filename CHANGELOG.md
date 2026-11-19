@@ -5,6 +5,22 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-es/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.0.1] - 2026-11-19
+
+### Fixed
+
+- La opción de no reducir el stock en pagos pendientes también controla la reducción automática de WooCommerce.
+- La sincronización desde el administrador consulta el último ID de pago y valida el tipo y estado de la orden.
+- La eliminación de la tabla `epayco_order` utiliza la API de base de datos de WordPress.
+- Se evita crear registros de stock heredados; el manejo de inventario usa los niveles nativos de WooCommerce.
+
+## [9.0.0] - 2026-11-18
+
+### Changed
+
+- Cambio visual de marca a Davipay; se mantienen intactos los flujos de pago.
+- Compatibilidad de lectura para metadatos de órdenes existentes de ePayco (`refPayco` y `epayco_meta_data`).
+
 ## [Unreleased]
 
 ### Changed
