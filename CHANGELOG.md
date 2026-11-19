@@ -5,6 +5,28 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-es/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.0.2] - 2026-11-19
+
+### Fixed
+
+- Los reintentos aprobados después de un rechazo descuentan el stock una sola vez mediante las funciones nativas de WooCommerce.
+- Los rechazos posteriores restauran el stock solo si fue descontado; un webhook de rechazo tardío no cancela pedidos pagados.
+- La sincronización desde el administrador reutiliza el token de Apify durante diez minutos.
+- Se aplica la opción de reducción de stock pendiente en el filtro nativo de WooCommerce y se retira el registro legacy de inventario.
+
+## [9.0.1] - 2026-11-19
+
+### Changed
+
+- Se mejoraron el manejo de estados e inventario de pedidos, la sincronización de órdenes y la gestión de la tabla de pedidos.
+
+## [9.0.0] - 2026-11-18
+
+### Changed
+
+- Cambio visual de marca a Davipay; se mantienen intactos los flujos de pago.
+- Compatibilidad de lectura para metadatos de órdenes existentes de ePayco (`refPayco` y `epayco_meta_data`).
+
 ## [Unreleased]
 
 ### Changed
