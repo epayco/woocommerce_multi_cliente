@@ -138,6 +138,12 @@ function epayco_can_reduce_order_stock($can_reduce, $order) {
     $settings = get_option('woocommerce_epayco_settings', array());
     $reduce_stock_pending = ($settings['epayco_reduce_stock_pending'] ?? 'yes') === 'yes';
 
+	  error_log(sprintf(
+        'Davipay stock filter: pedido %d, estado %s, reducir_en_pendiente=%s',
+        $order->get_id(), $order->get_status(), $reduce_pending ? 'yes' : 'no'
+    ));
+
+
     if (!$reduce_stock_pending && in_array($order->get_status(), array('pending', 'on-hold'), true)) {
         return false;
     }
