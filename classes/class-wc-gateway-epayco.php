@@ -345,12 +345,6 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
             $phone_billing = @$order->billing_phone;
             $email_billing = @$order->billing_email;
 
-            //Busca si ya se restauro el stock
-            if (!EpaycoOrder::ifExist($order_id)) {
-                //si no se restauro el stock restaurarlo inmediatamente
-                EpaycoOrder::create($order_id, 1);
-                //$this->restore_order_stock($order->get_id(),"decrease");
-            }
             $orderStatus = "pending";
             $current_state = $order->get_status();
             if ($current_state != $orderStatus) {

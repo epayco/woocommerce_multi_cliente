@@ -4,7 +4,7 @@ Donate link: https://davipay.com/
 Tags: payments, checkout, woocommerce, davipay, gateway
 Requires at least: 7.4
 Tested up to: 6.8.3
-Stable tag: 9.0.0
+Stable tag: 9.0.1
 Requires PHP: 7.4
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -101,6 +101,11 @@ Approve your account to go to production and receive real payments.
 
 = 8.2.3 =
 * upload release
+
+= 9.0.1 =
+* Fix: la opción de stock en transacciones pendientes aplica también a la reducción automática de WooCommerce.
+* Fix: la sincronización de órdenes pendientes consulta el último ID de pago y admite metadatos heredados.
+* Fix: la eliminación de la tabla de órdenes utiliza la API de base de datos de WordPress.
 
 = 9.0.0 =
 * Rebranding to Davipay
