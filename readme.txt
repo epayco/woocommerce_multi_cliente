@@ -4,7 +4,7 @@ Donate link: https://davipay.com/
 Tags: payments, checkout, woocommerce, davipay, gateway
 Requires at least: 7.4
 Tested up to: 6.8.3
-Stable tag: 9.0.0
+Stable tag: 9.0.2
 Requires PHP: 7.4
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -101,6 +101,16 @@ Approve your account to go to production and receive real payments.
 
 = 8.2.3 =
 * upload release
+
+= 9.0.2 =
+* SDK-1430: los reintentos de pago que se aprueban tras un rechazo descuentan el stock una sola vez, usando la reducción nativa de WooCommerce.
+* Un rechazo posterior restaura el stock solo si estaba descontado; los rechazos sucesivos no alteran el inventario.
+* Un rechazo recibido después del pago ya no cancela una orden exitosa.
+* La consulta de estado desde el administrador reutiliza durante 10 minutos el token de Apify.
+
+= 9.0.1 =
+* Manejo de estados y stock de pedidos actualizado; se agregó el filtro para respetar la opción de stock pendiente.
+* Se mejoró la sincronización de pedidos y el acceso a la tabla de órdenes.
 
 = 9.0.0 =
 * Rebranding to Davipay

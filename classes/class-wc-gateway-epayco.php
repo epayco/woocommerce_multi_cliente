@@ -16,6 +16,8 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
     public static $_settings = array();
     public const PAYMENTS_IDS = 'davipay_meta_data';
     public const PAYMENTS_IDS_LEGACY = 'epayco_meta_data';
+    public const APIFY_TOKEN_TRANSIENT = 'davipay_apify_token';
+    public const APIFY_TOKEN_TTL = 600;
     /**
      * Constructor for the gateway.
      *
@@ -345,12 +347,6 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
             $phone_billing = @$order->billing_phone;
             $email_billing = @$order->billing_email;
 
-            //Busca si ya se restauro el stock
-            if (!EpaycoOrder::ifExist($order_id)) {
-                //si no se restauro el stock restaurarlo inmediatamente
-                EpaycoOrder::create($order_id, 1);
-                //$this->restore_order_stock($order->get_id(),"decrease");
-            }
             $orderStatus = "pending";
             $current_state = $order->get_status();
             if ($current_state != $orderStatus) {
@@ -717,11 +713,6 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                     ]);
 
 
-                    //validar si la transaccion esta pendiente y pasa a rechazada y ya habia descontado el stock
-                    if (($current_state == 'on-hold' || $current_state == 'pending') && ((int)$x_cod_transaction_state == 2 || (int)$x_cod_transaction_state == 4) && EpaycoOrder::ifStockDiscount($order_id)) {
-                        //si no se restauro el stock restaurarlo inmediatamente
-                        // Epayco_Transaction_Handler::restore_stock($order_id);
-                    };
                 } else {
 
                     if (
@@ -1179,6 +1170,27 @@ class WC_Gateway_Epayco extends WC_Payment_Gateway
                 'Authorization' => "Basic " . $bearer_token
             );
             return $this->epayco_realizar_llamada_api("login", [], $headers);
+        }
+
+        public function getApifyToken($forceRefresh = false)
+        {
+            if (!$forceRefresh) {
+                $cached = get_transient(self::APIFY_TOKEN_TRANSIENT);
+                if (is_array($cached) && !empty($cached['token'])) {
+                    return $cached;
+                }
+            }
+
+            delete_transient(self::APIFY_TOKEN_TRANSIENT);
+            $login = $this->epyacoBerarToken();
+            if (!is_array($login) || empty($login['token'])) {
+                return false;
+            }
+
+            $token = array('token' => $login['token']);
+            set_transient(self::APIFY_TOKEN_TRANSIENT, $token, self::APIFY_TOKEN_TTL);
+
+            return $token;
         }
 
         public function epayco_realizar_llamada_api($path, $data, $headers, $method = 'POST')
