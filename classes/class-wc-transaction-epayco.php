@@ -3,25 +3,6 @@ if (! defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-/**
- * Keep WooCommerce from reserving stock for ePayco orders while they are pending
- * when the merchant has disabled pending-stock reduction.
- */
-add_filter('woocommerce_can_reduce_order_stock', function ($can_reduce, $order) {
-    if (! $order instanceof WC_Order || $order->get_payment_method() !== 'epayco') {
-        return $can_reduce;
-    }
-
-    $settings = get_option('woocommerce_epayco_settings', array());
-    $reduce_pending = ($settings['epayco_reduce_stock_pending'] ?? null) === 'yes';
-
-    if (! $reduce_pending && in_array($order->get_status(), array('pending', 'on-hold'), true)) {
-        return false;
-    }
-
-    return $can_reduce;
-}, 10, 2);
-
 class Epayco_Transaction_Handler
 {
     public static function handle_transaction($order, $data, $settings)
@@ -36,30 +17,26 @@ class Epayco_Transaction_Handler
         $estado_cancelado = self::get_cancel_status($settings);
 
         switch ((int) $data['x_cod_transaction_state']) {
-            case 1: // Aprobada
+            case 1:
                 self::handle_approved($order, $order_id, $current_state, $settings, $estado_final_exitoso);
                 echo '1';
                 break;
-
             case 2:
             case 4:
             case 10:
-            case 11: // Cancelada, fallida o rechazada
+            case 11:
                 self::handle_failed($order, $current_state, $estado_cancelado, $data['is_confirmation'], $settings);
                 echo '2';
                 break;
-
             case 3:
-            case 7: // Pendiente
+            case 7:
                 self::handle_pending($order, $order_id, $current_state, $settings);
                 echo '3';
                 break;
-
-            case 6: // Reversado
+            case 6:
                 self::handle_reversed($order);
                 echo '6';
                 break;
-
             default:
                 self::handle_default($order, $current_state);
                 echo 'default';
@@ -83,7 +60,6 @@ class Epayco_Transaction_Handler
         if ($reference === '' || $reference === null) {
             $reference = $order->get_meta('refPayco');
         }
-
         return $reference;
     }
 
@@ -93,10 +69,8 @@ class Epayco_Transaction_Handler
             return ($settings['end_order_state'] === 'processing') ? 'processing_test' :
                 (($settings['end_order_state'] === 'completed') ? 'completed_test' :
                     (($settings['end_order_state'] === 'epayco-processing') ? 'epayco_processing' :
-                        (($settings['end_order_state'] === 'epayco-completed') ? 'epayco_completed' :
-                            $settings['end_order_state'])));
+                        (($settings['end_order_state'] === 'epayco-completed') ? 'epayco_completed' : $settings['end_order_state'])));
         }
-
         return $settings['end_order_state'];
     }
 
@@ -107,16 +81,12 @@ class Epayco_Transaction_Handler
                 (($settings['cancel_order_state'] === 'epayco-cancelled') ? 'epayco_cancelled' :
                     (($settings['cancel_order_state'] === 'epayco-failed') ? 'epayco_failed' : 'failed'));
         }
-
         return $settings['cancel_order_state'];
     }
 
     private static function success_states()
     {
-        return array(
-            'processing', 'completed', 'processing_test', 'completed_test',
-            'epayco-processing', 'epayco-completed', 'epayco_processing', 'epayco_completed',
-        );
+        return array('processing', 'completed', 'processing_test', 'completed_test', 'epayco-processing', 'epayco-completed', 'epayco_processing', 'epayco_completed');
     }
 
     private static function handle_approved($order, $order_id, $current_state, $settings, $estado_final_exitoso)
@@ -124,9 +94,7 @@ class Epayco_Transaction_Handler
         $logger = new WC_Logger();
         try {
             $reduce_pending = ($settings['reduce_stock_pending'] ?? null) === 'yes';
-
             if ($current_state === 'pending') {
-                // Aprobado en espera de confirmación: reservar stock solo si está configurado.
                 $order->update_status('on-hold');
                 $order->save();
                 if ($reduce_pending) {
@@ -141,7 +109,7 @@ class Epayco_Transaction_Handler
                 $order->save();
             }
 
-            // La reducción nativa de WooCommerce es idempotente por orden.
+            // Use WooCommerce's native idempotent order stock reduction.
             self::reduce_stock($order_id);
         } catch (\Exception $ex) {
             $error_message = "handle_approved got error: {$ex->getMessage()}";
@@ -154,15 +122,13 @@ class Epayco_Transaction_Handler
     {
         $logger = new WC_Logger();
         try {
-            // Una notificación de rechazo tardía no debe revertir un pago confirmado.
+            // Do not let a late failed webhook cancel an already-paid order.
             if (in_array($current_state, self::success_states(), true)) {
                 return;
             }
 
             $order->update_status($estado_cancelado);
             $order->save();
-
-            // WooCommerce restaura solo si su bandera nativa indica stock reducido.
             self::restore_stock_once($order->get_id());
 
             if (($settings['reduce_stock_pending'] ?? null) === 'yes' && $current_state === 'pending' && ! $isConfirmation) {
@@ -187,7 +153,6 @@ class Epayco_Transaction_Handler
             $order->save();
         }
 
-        // Reservar stock en pendientes únicamente cuando el comercio lo haya habilitado.
         if (($settings['reduce_stock_pending'] ?? null) === 'yes') {
             self::reduce_stock($order_id);
         }
@@ -223,12 +188,7 @@ class Epayco_Transaction_Handler
         }
     }
 
-    /**
-     * Compatibility wrapper for existing callers.
-     *
-     * @param int    $order_id Order ID.
-     * @param string $direction Stock adjustment direction.
-     */
+    // Preserve compatibility with callers that still use this method.
     public static function restore_stock($order_id, $direction = 'increase')
     {
         if ($direction === 'decrease') {
