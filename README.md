@@ -31,7 +31,7 @@
 
 ## Instalación
 
-1. [Descarga el plugin.](https://github.com/epayco/woocommerce_multi_cliente)
+1. [Descarga el plugin.](https://github.com/epayco/woocommerce_multi_cliente#versiones)
 2. Ingresa al administrador de tu wordPress.
 3. Ingresa a Administrador de la red / Plugins / Añadir-Nuevo / Subir-Plugin. 
 4. Busca el plugin descargado en tu equipo y súbelo como cualquier otro archivo.
