@@ -1,12 +1,10 @@
 # Davipay plugin for WooCommerce Multi Sitio
 
-**Si usted tiene alguna pregunta o problema, no dude en ponerse en contacto con nuestro soporte técnico: desarrollo@davipay.com.**
+**Si usted tiene alguna pregunta o problema, no dude en ponerse en contacto con nuestro soporte técnico: desarrollo@epayco.com ó desarrolladores@epayco.com**
 
 ## Versiones
-* [Davipay plugin WooCommerce v9.0.2](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.2).
-* [Davipay plugin WooCommerce v9.0.1](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.1).
-* [Davipay plugin WooCommerce v9.0.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.0).
-* [Davipay plugin WooCommerce v4.x](https://github.com/epayco/woocommerce_multi_cliente).
+
+* [Davipay plugin WooCommerce v4.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v4.x.x).
 * [Davipay plugin WooCommerce v5.0.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v5.0.0).
 * [Davipay plugin WooCommerce v5.1.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v5.1.0).
 * [Davipay plugin WooCommerce v7.0.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v7.0.0).
@@ -14,6 +12,9 @@
 * [Davipay plugin WooCommerce v8.0.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v8.0.0).
 * [Davipay plugin WooCommerce v8.1.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v8.1.0).
 * [Davipay plugin WooCommerce v8.2.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v8.2.0).
+* [Davipay plugin WooCommerce v9.0.2](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.2).
+* [Davipay plugin WooCommerce v9.0.1](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.1).
+* [Davipay plugin WooCommerce v9.0.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.0).
 
 ## Tabla de contenido
 
@@ -31,13 +32,13 @@
 
 ## Instalación
 
-1. [Descarga el plugin.](https://github.com/epayco/woocommerce_multi_cliente)
+1. [Descarga el plugin.](https://github.com/epayco/woocommerce_multi_cliente#versiones)
 2. Ingresa al administrador de tu wordPress.
 3. Ingresa a Administrador de la red / Plugins / Añadir-Nuevo / Subir-Plugin. 
 4. Busca el plugin descargado en tu equipo y súbelo como cualquier otro archivo.
 5. Después de instalar el .zip lo puedes ver en la lista de plugins instalados , puedes activarlo o desactivarlo.
 6. Para configurar el plugin debes ir a: Administrador de la red / sitios / seleccionar la tienda / Escritorio / WooCommerce / Ajustes / Pagos y ubica la pestaña Davipay.
-7. Configura el plugin ingresando el **P_CUST_ID_CLIENTE**, **P_KEY**, **PUBLIC_KEY** y **PRIVATE_KEY**; puedes encontrarlos en tu [panel de clientes](https://dashboard.davipay.co/login).
+7. Configura el plugin ingresando el **P_CUST_ID_CLIENTE**, **P_KEY**, **PUBLIC_KEY** y **PRIVATE_KEY**; puedes encontrarlos en tu [panel de clientes](https://dashboard.davipay.com/configuration).
 8. Selecciona o crea una página de respuesta donde el usuario será devuelto después de finalizar la compra.
 9. Realiza una o varias compras para comprobar que todo esté bien.
 10. Si todo está bien recuerda cambiar la variable Modo Prueba a NO y empieza a recibir pagos de forma instantánea y segura con Davipay.
