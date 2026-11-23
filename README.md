@@ -3,10 +3,8 @@
 **Si usted tiene alguna pregunta o problema, no dude en ponerse en contacto con nuestro soporte técnico: desarrollo@epayco.com ó desarrolladores@epayco.com**
 
 ## Versiones
-* [Davipay plugin WooCommerce v9.0.2](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.2).
-* [Davipay plugin WooCommerce v9.0.1](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.1).
-* [Davipay plugin WooCommerce v9.0.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.0).
-* [Davipay plugin WooCommerce v4.x](https://github.com/epayco/woocommerce_multi_cliente).
+
+* [Davipay plugin WooCommerce v4.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v4.x.x).
 * [Davipay plugin WooCommerce v5.0.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v5.0.0).
 * [Davipay plugin WooCommerce v5.1.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v5.1.0).
 * [Davipay plugin WooCommerce v7.0.x](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v7.0.0).
@@ -14,6 +12,9 @@
 * [Davipay plugin WooCommerce v8.0.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v8.0.0).
 * [Davipay plugin WooCommerce v8.1.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v8.1.0).
 * [Davipay plugin WooCommerce v8.2.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v8.2.0).
+* [Davipay plugin WooCommerce v9.0.2](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.2).
+* [Davipay plugin WooCommerce v9.0.1](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.1).
+* [Davipay plugin WooCommerce v9.0.0](https://github.com/epayco/woocommerce_multi_cliente/releases/tag/v9.0.0).
 
 ## Tabla de contenido
 
